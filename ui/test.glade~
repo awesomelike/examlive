@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Generated with glade 3.22.1 -->
+<interface>
+  <requires lib="gtk+" version="3.20"/>
+  <object class="GtkWindow" id="login_window">
+    <property name="can_focus">False</property>
+    <property name="resizable">False</property>
+    <child>
+      <placeholder/>
+    </child>
+    <child>
+      <object class="GtkFixed" id="login_fixed">
+        <property name="visible">True</property>
+        <property name="can_focus">False</property>
+        <child>
+          <object class="GtkImage" id="login_image_1">
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <property name="pixbuf">../style/main_login.jpg</property>
+          </object>
+          <packing>
+            <property name="x">-1</property>
+            <property name="y">-1</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkLabel" id="login_button">
+            <property name="name">login_btn</property>
+            <property name="width_request">100</property>
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <property name="label" translatable="yes">Login</property>
+            <attributes>
+              <attribute name="font-desc" value="Noto Serif CJK SC 15"/>
+              <attribute name="style" value="normal"/>
+              <attribute name="weight" value="semibold"/>
+              <attribute name="foreground" value="#f3f3f3f3f3f3"/>
+            </attributes>
+          </object>
+          <packing>
+            <property name="x">369</property>
+            <property name="y">294</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkEntry">
+            <property name="name">login_pwd</property>
+            <property name="width_request">190</property>
+            <property name="visible">True</property>
+            <property name="can_focus">True</property>
+            <property name="visibility">False</property>
+            <property name="invisible_char">*</property>
+            <property name="placeholder_text" translatable="yes">password</property>
+          </object>
+          <packing>
+            <property name="x">334</property>
+            <property name="y">219</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkEntry" id="login_username">
+            <property name="name">login_usr</property>
+            <property name="width_request">190</property>
+            <property name="visible">True</property>
+            <property name="can_focus">True</property>
+          </object>
+          <packing>
+            <property name="x">335</property>
+            <property name="y">140</property>
+          </packing>
+        </child>
+      </object>
+    </child>
+  </object>
+</interface>
