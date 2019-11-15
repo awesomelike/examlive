@@ -32,24 +32,30 @@ int main(int argc, char *argv[]) {
 
 	//We refer to DB instance with this variable
 	MYSQL *conn;
-	db_connect(conn);
-
+	conn = mysql_init(NULL);
+	if(!(mysql_real_connect(conn, host, user, pass, dbname, port, unix_socket, flag))) {
+		printf("%s\n", "some error there gentleman");
+		return;
+	}
+	//printf("%s\n", "DB connection successful!");
 	
 	
-	//MYSQL_RES *res;
-	//MYSQL_ROW row;
-
-	//if(mysql_query(conn, "SELECT title FROM `courses` ")) {
-	//	fprintf(stderr, "Error=%s\n", mysql_error(conn));
-	//}
-
-	//res = mysql_store_result(conn);
-	//int num_fields = mysql_num_fields(res);
+	
+	if (mysql_query(conn, "SELECT * FROM courses")) {
+	 	fprintf(stderr, "Error=%s\n", mysql_error(conn));
+	}
+	MYSQL_RES *res;
+	res = mysql_store_result(conn);
+	int num_fields = mysql_num_fields(res);
+	MYSQL_ROW *row;
 	//printf("%d\n", num_fields);
-	// while ((row = mysql_fetch_row(res)))
-	// {
-	// 	printf("Row = %s\n", row[1]);
-	// }
+	while ((row = mysql_fetch_row(res)))
+	{
+		for(int i=0; i<num_fields; i++) {
+			printf("%s ", row[i]);
+		}
+	}
+	
 	
 	return 0;
 }
