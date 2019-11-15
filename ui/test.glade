@@ -29,9 +29,9 @@
             <property name="width_request">100</property>
             <property name="visible">True</property>
             <property name="can_focus">False</property>
-            <property name="label" translatable="yes">Login</property>
+            <property name="label" translatable="yes">LOGIN</property>
             <attributes>
-              <attribute name="font-desc" value="Noto Serif CJK SC 15"/>
+              <attribute name="font-desc" value="Open Sans Bold 15"/>
               <attribute name="style" value="normal"/>
               <attribute name="weight" value="semibold"/>
               <attribute name="foreground" value="#f3f3f3f3f3f3"/>
