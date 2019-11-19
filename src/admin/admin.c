@@ -158,9 +158,7 @@ void on_add_course_clicked (GtkButton *b) {
 	
 	while ((row = mysql_fetch_row(res)))
 	{
-		gtk_list_store_insert_with_values(liststore2, NULL, -1,
-										0, row[0],
-										1, row[2]);
+		gtk_list_store_insert_with_values(liststore2, NULL, -1, 0, row[0], 1, row[2]);
 	}
 	mysql_free_result(res);	
 	gtk_widget_show(window_course);
@@ -269,12 +267,9 @@ void on_btn_main_menu_clicked (GtkButton *b) {
 
 void on_entry_course_title_changed(GtkEntry *e) {
 	sprintf(course_title, "%s", gtk_entry_get_text(e));
-	//printf("%s\n", course_title);
 }
 
 void on_combo_course_professor_changed(GtkComboBox *c) {
-	//printf("%d\n", (int)gtk_combo_box_get_id_column(combo_course_professor));
-	//printf("%d\n", (int)gtk_combo_box_get_column_span_column (combo_course_professor));
 	printf("%s\n", gtk_combo_box_get_active_id(combo_course_professor));
 	sprintf(course_pid, "%s", gtk_combo_box_get_active_id(combo_course_professor));
 }

@@ -34,16 +34,6 @@ GtkWidget	*login_password;
 GtkBuilder	*builder; 
 
 
-//This function establishes DB connection
-// void db_connect (MYSQL *conn) {
-// 	conn = mysql_init(NULL);
-// 	if(!(mysql_real_connect(conn, host, user, pass, dbname, port, unix_socket, flag))) {
-// 		printf("%s\n", "some error there gentleman");
-// 		return;
-// 	}
-// 	printf("%s\n", "DB connection successful!");
-// }
-
 int main(int argc, char *argv[]) {
 
 	//We refer to DB instance with this variable
