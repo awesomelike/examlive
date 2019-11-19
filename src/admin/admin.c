@@ -50,12 +50,24 @@ GtkWidget 	*window_course;
 GtkWidget 	*fixed3;
 GtkWidget	*label3;
 GtkWidget	*btn_back2;
+GtkWidget	*label_course_title;
+GtkWidget	*label_course_professor;
+GtkWidget	*entry_course_title;
+GtkWidget	*combo_course_professor;
+GtkWidget	*btn_save_course;
+GtkListStore *liststore2;
 
+GtkWidget	*window_course_added;
+GtkWidget	*fixed4;
+GtkWidget	*btn_main_menu1;
 
-
+//Vars to store values from add user page
 char user_type[1] = "S";
 char user_full_name[128];
 
+//Vars to store values from add course page
+char course_title[128];
+char course_pid[7];
 
 int main(int argc, char *argv[]) {
 	
@@ -98,15 +110,25 @@ int main(int argc, char *argv[]) {
 	window_course = GTK_WIDGET(gtk_builder_get_object(builder, "window_course"));
 	fixed3 = GTK_WIDGET(gtk_builder_get_object(builder, "fixed3"));
     label3 = GTK_WIDGET(gtk_builder_get_object(builder, "label3"));
+	label_course_title = GTK_WIDGET(gtk_builder_get_object(builder, "label_course_title"));
+	label_course_professor = GTK_WIDGET(gtk_builder_get_object(builder, "label_course_professor"));
+	entry_course_title = GTK_WIDGET(gtk_builder_get_object(builder, "entry_course_title"));
+	combo_course_professor = GTK_WIDGET(gtk_builder_get_object(builder, "combo_course_professor"));
+	liststore2 = GTK_LIST_STORE(gtk_builder_get_object(builder, "liststore2"));
+	btn_save_course = GTK_WIDGET(gtk_builder_get_object(builder, "btn_save_course"));
+	
+	window_course_added = GTK_WIDGET(gtk_builder_get_object(builder, "window_course_added"));
+	btn_main_menu1 = GTK_WIDGET(gtk_builder_get_object(builder, "btn_main_menu1"));
 
 	btn_back1 = GTK_WIDGET(gtk_builder_get_object(builder, "btn_back1"));
-	btn_back1 = GTK_WIDGET(gtk_builder_get_object(builder, "btn_back2"));
+	btn_back2 = GTK_WIDGET(gtk_builder_get_object(builder, "btn_back2"));
 	gtk_widget_show(admin_main);
 
 	gtk_main();
 
 	return EXIT_SUCCESS;
 	}
+
 //Handlers in main menu
 void on_add_user_clicked (GtkButton *b) {
     gtk_widget_hide(admin_main);
@@ -117,7 +139,31 @@ void on_add_user_clicked (GtkButton *b) {
 }
 void on_add_course_clicked (GtkButton *b) {
 	gtk_widget_hide(admin_main);
-	gtk_widget_show(window_user);
+	int num_rows;
+	if (mysql_query(conn, "SELECT COUNT(*) FROM professors")) {
+		fprintf(stderr, "%s\n", mysql_error(conn)); 
+	}
+	res = mysql_store_result(conn);
+	while (row = mysql_fetch_row(res))
+	{
+		num_rows = row[0];
+	}
+	printf("%d\n", num_rows);
+	mysql_free_result(res); 
+	
+	if(mysql_query(conn, "SELECT * FROM professors")) {
+		fprintf(stderr, "%s\n", mysql_error(conn)); 
+	}
+	res = mysql_store_result(conn);
+	
+	while ((row = mysql_fetch_row(res)))
+	{
+		gtk_list_store_insert_with_values(liststore2, NULL, -1,
+										0, row[0],
+										1, row[2]);
+	}
+	mysql_free_result(res);	
+	gtk_widget_show(window_course);
 }
 
 //Handlers in add user
@@ -218,6 +264,47 @@ void on_btn_save_user_clicked (GtkButton *b) {
 
 void on_btn_main_menu_clicked (GtkButton *b) {
 	gtk_widget_hide(window_user_added);
+	gtk_widget_show(admin_main);
+}
+
+void on_entry_course_title_changed(GtkEntry *e) {
+	sprintf(course_title, "%s", gtk_entry_get_text(e));
+	//printf("%s\n", course_title);
+}
+
+void on_combo_course_professor_changed(GtkComboBox *c) {
+	//printf("%d\n", (int)gtk_combo_box_get_id_column(combo_course_professor));
+	//printf("%d\n", (int)gtk_combo_box_get_column_span_column (combo_course_professor));
+	printf("%s\n", gtk_combo_box_get_active_id(combo_course_professor));
+	sprintf(course_pid, "%s", gtk_combo_box_get_active_id(combo_course_professor));
+}
+
+void on_btn_save_course_clicked(GtkButton *b) {
+	char sql_insert[1024];
+	sprintf(sql_insert,
+			"INSERT INTO courses(title) VALUES('%s')", 
+			course_title
+			);
+	if (mysql_query(conn, sql_insert)==0) {
+		int course_insert_id = mysql_insert_id(conn);
+		sprintf(sql_insert,
+			"INSERT INTO teach(id, course_id) VALUES('%s', %d)", 
+			course_pid,
+			course_insert_id
+			);
+		if (mysql_query(conn, sql_insert)==0) {
+			printf("%s\n", "Course inserted successfully");
+		}
+		printf("%s\n", "Inserted successfully");
+	}
+	gtk_entry_set_text(GTK_ENTRY(entry_course_title), (const gchar*) "");
+
+	gtk_widget_hide(window_course);
+	gtk_widget_show(window_course_added);	
+}
+
+void on_btn_main_menu1_clicked(GtkButton *b) {
+	gtk_widget_hide(window_course_added);
 	gtk_widget_show(admin_main);
 }
 
