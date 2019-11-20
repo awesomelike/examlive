@@ -139,6 +139,13 @@ void on_add_user_clicked (GtkButton *b) {
 }
 void on_add_course_clicked (GtkButton *b) {
 	gtk_widget_hide(admin_main);
+	
+	// GtkTreeIter *iter;
+	// while (gtk_list_store_remove(liststore2, &iter))
+	// {
+	// 	gtk_list_store_remove(liststore2, &iter);
+	// }
+	
 	int num_rows;
 	if (mysql_query(conn, "SELECT COUNT(*) FROM professors")) {
 		fprintf(stderr, "%s\n", mysql_error(conn)); 
@@ -309,5 +316,6 @@ void on_btn_back1_clicked (GtkButton *b) {
 }
 void on_btn_back2_clicked (GtkButton *b) {
 	gtk_widget_hide(window_course);
+	gtk_list_store_clear(liststore2);
 	gtk_widget_show(admin_main);
 }
