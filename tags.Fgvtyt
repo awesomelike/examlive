@@ -1,0 +1,13 @@
+TARGET	makefile	/^TARGET=ExamLive$/;"	m
+CC	makefile	/^CC=gcc$/;"	m
+DEBUG	makefile	/^DEBUG=-g$/;"	m
+OPT	makefile	/^OPT=-O0$/;"	m
+WARN	makefile	/^WARN=-Wall$/;"	m
+PTHREAD	makefile	/^PTHREAD=-pthread -lpthread$/;"	m
+CCFLAGS	makefile	/^CCFLAGS=$(DEBUG) $(OPT) $(WARN) $(PTHREAD) -pipe$/;"	m
+GTKLIB	makefile	/^GTKLIB=`pkg-config --cflags --libs gtk+-3.0`$/;"	m
+MySqlLib	makefile	/^MySqlLib = `mysql_config --libs`$/;"	m
+MySqlConfig	makefile	/^MySqlConfig = `mysql_config -- cflags`$/;"	m
+LD	makefile	/^LD=gcc$/;"	m
+LDFLAGS	makefile	/^LDFLAGS=$(PTHREAD) $(GTKLIB) -export-dynamic$/;"	m
+OBJS	makefile	/^OBJS=    examlive.o$/;"	m

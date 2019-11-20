@@ -33,6 +33,12 @@ GtkWidget	*login_username;
 GtkWidget	*login_password;
 GtkBuilder	*builder; 
 
+//GTK professor main panel Page
+GtkWidget *pr_window_panel;
+GtkWidget *start_btn;
+GtkWidget *pr_swap_panel;
+
+
 
 int main(int argc, char *argv[]) {
 
@@ -49,18 +55,26 @@ int main(int argc, char *argv[]) {
  
 	builder = gtk_builder_new_from_file ("ui/test.glade");
  
-	login_window = GTK_WIDGET(gtk_builder_get_object(builder, "login_window"));
+	//main windows variables
 
+	login_window = GTK_WIDGET(gtk_builder_get_object(builder, "login_window"));
+	pr_window_panel=  GTK_WIDGET(gtk_builder_get_object(builder, "pr_window_panel"));
+	
 	g_signal_connect(login_window, "destroy", G_CALLBACK(gtk_main_quit), NULL);
 
     gtk_builder_connect_signals(builder, NULL);
 
-    //declare variables
+    //declare variables login
 	login_fixed = GTK_WIDGET(gtk_builder_get_object(builder, "login_fixed"));
 	login_button = GTK_WIDGET(gtk_builder_get_object(builder, "login_button"));
 	login_image_1 = GTK_WIDGET(gtk_builder_get_object(builder, "login_image_1"));
 	login_username = GTK_WIDGET(gtk_builder_get_object(builder, "login_username"));
 	login_password = GTK_WIDGET(gtk_builder_get_object(builder, "login_password"));
+
+	//declare variable professor panel
+	start_btn = GTK_WIDGET(gtk_builder_get_object(builder, "start_btn"));
+	pr_swap_panel = GTK_WIDGET(gtk_builder_get_object(builder, "swaping_panel"));
+	
 
 	//These lines used to connect CSS
     provider = gtk_css_provider_new();
@@ -77,4 +91,12 @@ int main(int argc, char *argv[]) {
 	gtk_main();
 		
 	return 0;
+}
+void on_sign_in_clicked  (GtkButton *b) {
+    gtk_widget_hide(login_window);
+	gtk_widget_show(pr_window_panel);
+	
+}
+void on_pr_start_quiz_clicked (GtkButton *c){
+	
 }
