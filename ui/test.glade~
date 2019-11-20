@@ -2,74 +2,7 @@
 <!-- Generated with glade 3.22.1 -->
 <interface>
   <requires lib="gtk+" version="3.20"/>
-  <object class="GtkWindow" id="login_window">
-    <property name="can_focus">False</property>
-    <property name="resizable">False</property>
-    <child>
-      <placeholder/>
-    </child>
-    <child>
-      <object class="GtkFixed" id="login_fixed">
-        <property name="visible">True</property>
-        <property name="can_focus">False</property>
-        <child>
-          <object class="GtkImage" id="login_image_1">
-            <property name="visible">True</property>
-            <property name="can_focus">False</property>
-            <property name="pixbuf">../style/main_login.jpg</property>
-          </object>
-          <packing>
-            <property name="x">-1</property>
-            <property name="y">-1</property>
-          </packing>
-        </child>
-        <child>
-          <object class="GtkEntry" id="login_password">
-            <property name="name">login_pwd</property>
-            <property name="width_request">190</property>
-            <property name="visible">True</property>
-            <property name="can_focus">True</property>
-            <property name="visibility">False</property>
-            <property name="invisible_char">*</property>
-            <property name="placeholder_text" translatable="yes">password</property>
-          </object>
-          <packing>
-            <property name="x">538</property>
-            <property name="y">246</property>
-          </packing>
-        </child>
-        <child>
-          <object class="GtkEntry" id="login_username">
-            <property name="name">login_usr</property>
-            <property name="width_request">190</property>
-            <property name="visible">True</property>
-            <property name="can_focus">True</property>
-            <property name="placeholder_text" translatable="yes">username</property>
-          </object>
-          <packing>
-            <property name="x">538</property>
-            <property name="y">186</property>
-          </packing>
-        </child>
-        <child>
-          <object class="GtkButton" id="sign_in">
-            <property name="label" translatable="yes">SIGN IN</property>
-            <property name="name">sign_in_btn</property>
-            <property name="width_request">100</property>
-            <property name="visible">True</property>
-            <property name="can_focus">True</property>
-            <property name="receives_default">True</property>
-            <property name="relief">none</property>
-            <signal name="clicked" handler="on_sign_in_clicked" swapped="no"/>
-          </object>
-          <packing>
-            <property name="x">568</property>
-            <property name="y">308</property>
-          </packing>
-        </child>
-      </object>
-    </child>
-  </object>
+  <object class="GtkListStore" id="liststore1"/>
   <object class="GtkWindow" id="pr_window_panel">
     <property name="can_focus">False</property>
     <child>
@@ -240,6 +173,8 @@
                 <property name="width_request">240</property>
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
+                <property name="tooltip_text" translatable="yes">enter quiz from quiz lists</property>
+                <property name="model">liststore1</property>
               </object>
               <packing>
                 <property name="x">15</property>
@@ -256,14 +191,112 @@
                 <property name="use_markup">True</property>
               </object>
               <packing>
-                <property name="x">374</property>
+                <property name="x">368</property>
                 <property name="y">6</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkButton" id="pr_open_Socket">
+                <property name="label" translatable="yes">Open Channel</property>
+                <property name="name">open_socket</property>
+                <property name="width_request">100</property>
+                <property name="visible">True</property>
+                <property name="can_focus">True</property>
+                <property name="receives_default">True</property>
+              </object>
+              <packing>
+                <property name="x">497</property>
+                <property name="y">4</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkScrolledWindow" id="pr_scroll_online_students">
+                <property name="width_request">270</property>
+                <property name="height_request">320</property>
+                <property name="visible">True</property>
+                <property name="can_focus">True</property>
+                <property name="shadow_type">out</property>
+                <child>
+                  <placeholder/>
+                </child>
+              </object>
+              <packing>
+                <property name="x">357</property>
+                <property name="y">50</property>
               </packing>
             </child>
           </object>
           <packing>
             <property name="x">244</property>
             <property name="y">65</property>
+          </packing>
+        </child>
+      </object>
+    </child>
+  </object>
+  <object class="GtkWindow" id="login_window">
+    <property name="can_focus">False</property>
+    <property name="resizable">False</property>
+    <child>
+      <placeholder/>
+    </child>
+    <child>
+      <object class="GtkFixed" id="login_fixed">
+        <property name="visible">True</property>
+        <property name="can_focus">False</property>
+        <child>
+          <object class="GtkImage" id="login_image_1">
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <property name="pixbuf">../style/main_login.jpg</property>
+          </object>
+          <packing>
+            <property name="x">-1</property>
+            <property name="y">-1</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkEntry" id="login_password">
+            <property name="name">login_pwd</property>
+            <property name="width_request">190</property>
+            <property name="visible">True</property>
+            <property name="can_focus">True</property>
+            <property name="visibility">False</property>
+            <property name="invisible_char">*</property>
+            <property name="placeholder_text" translatable="yes">password</property>
+          </object>
+          <packing>
+            <property name="x">538</property>
+            <property name="y">246</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkEntry" id="login_username">
+            <property name="name">login_usr</property>
+            <property name="width_request">190</property>
+            <property name="visible">True</property>
+            <property name="can_focus">True</property>
+            <property name="placeholder_text" translatable="yes">username</property>
+          </object>
+          <packing>
+            <property name="x">538</property>
+            <property name="y">186</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkButton" id="sign_in">
+            <property name="label" translatable="yes">SIGN IN</property>
+            <property name="name">sign_in_btn</property>
+            <property name="width_request">100</property>
+            <property name="visible">True</property>
+            <property name="can_focus">True</property>
+            <property name="receives_default">True</property>
+            <property name="relief">none</property>
+            <signal name="clicked" handler="on_sign_in_clicked" swapped="no"/>
+          </object>
+          <packing>
+            <property name="x">568</property>
+            <property name="y">308</property>
           </packing>
         </child>
       </object>
