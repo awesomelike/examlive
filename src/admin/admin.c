@@ -9,6 +9,7 @@
 #include <math.h>
 #include <time.h>
 #include <ctype.h>
+#include <stdbool.h>
 
 //Database credentials
 static char *host = "db4free.net";
@@ -137,14 +138,11 @@ void on_add_user_clicked (GtkButton *b) {
 	sprintf(user_type, "%s", "S");
 	sprintf(user_full_name, "%s", NULL);
 }
+//This temporary array and variable is to handle duplicate rows in the list store
+char ids[64][7];
+int row_count = 0;
 void on_add_course_clicked (GtkButton *b) {
 	gtk_widget_hide(admin_main);
-	
-	// GtkTreeIter *iter;
-	// while (gtk_list_store_remove(liststore2, &iter))
-	// {
-	// 	gtk_list_store_remove(liststore2, &iter);
-	// }
 	
 	int num_rows;
 	if (mysql_query(conn, "SELECT COUNT(*) FROM professors")) {
@@ -165,7 +163,18 @@ void on_add_course_clicked (GtkButton *b) {
 	
 	while ((row = mysql_fetch_row(res)))
 	{
-		gtk_list_store_insert_with_values(liststore2, NULL, -1, 0, row[0], 1, row[2]);
+		int exists = 0;
+		for (int j=0; j<=row_count; j++) {
+			if(strcmp(ids[j], row[0])==0) {
+				exists = 1;
+			} 
+		}
+		if(exists == 0) {
+			strcpy(ids[row_count], row[0]);
+			gtk_list_store_insert_with_values(liststore2, NULL, -1, 0, row[0], 1, row[2]);		
+			row_count = row_count+1;
+		}
+		
 	}
 	mysql_free_result(res);	
 	gtk_widget_show(window_course);
@@ -316,6 +325,5 @@ void on_btn_back1_clicked (GtkButton *b) {
 }
 void on_btn_back2_clicked (GtkButton *b) {
 	gtk_widget_hide(window_course);
-	gtk_list_store_clear(liststore2);
 	gtk_widget_show(admin_main);
 }
