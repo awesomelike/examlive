@@ -3,7 +3,7 @@
     border: 0px solid;
     box-shadow: none;
     font-family: 'Open Sans';
-    color: rgb(248, 248, 248);
+    color: rgb(51, 50, 50);
     outline: none;
 }
 
@@ -12,10 +12,25 @@
     border: 0px solid;
     box-shadow: none;
     font-family: 'Open Sans';
-    color: rgb(248, 248, 248);
+    color: rgb(51, 50, 50);
 }
 
 #login_btn {
     font-family: 'Open Sans';
     font-weight: bold;
+}
+#start_quiz{
+    border: 0px solid;
+    font-size: 20px;
+    
+    color: rgb(255, 255, 255);
+    box-shadow: none;
+    border-radius: 0px;
+}
+#start_quiz:hover{
+    border: 0px solid;
+    font-size: 20px;
+    color: rgb(61, 61, 61);
+    box-shadow: none;
+    border-radius: 0px;
 }
