@@ -167,6 +167,7 @@ void on_add_course_clicked (GtkButton *b) {
 		for (int j=0; j<=row_count; j++) {
 			if(strcmp(ids[j], row[0])==0) {
 				exists = 1;
+				break;
 			} 
 		}
 		if(exists == 0) {
