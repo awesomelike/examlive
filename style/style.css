@@ -39,3 +39,9 @@
     color: rgb(31, 31, 31);
     font-size: 16px;
 }
+#btn_save{
+    background-color: rgb(36, 173, 36);
+    color:white;
+    border-radius: 0px;
+
+}
