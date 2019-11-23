@@ -58,6 +58,10 @@ GtkWidget	*combo_course_professor;
 GtkWidget	*btn_save_course;
 GtkListStore *liststore2;
 
+GtkWidget	*window_assign_course;
+GtkWidget	*grid_assign;
+GtkWidget	*button_action[500];
+
 GtkWidget	*window_course_added;
 GtkWidget	*fixed4;
 GtkWidget	*btn_main_menu1;
@@ -69,6 +73,9 @@ char user_full_name[128];
 //Vars to store values from add course page
 char course_title[128];
 char course_pid[7];
+
+//Function prototypes
+void on_assign_row_btn_clicked(GtkButton*, int); 
 
 int main(int argc, char *argv[]) {
 	
@@ -120,6 +127,9 @@ int main(int argc, char *argv[]) {
 	
 	window_course_added = GTK_WIDGET(gtk_builder_get_object(builder, "window_course_added"));
 	btn_main_menu1 = GTK_WIDGET(gtk_builder_get_object(builder, "btn_main_menu1"));
+
+	window_assign_course = GTK_WIDGET(gtk_builder_get_object(builder, "window_assign_course"));
+	grid_assign = GTK_WIDGET(gtk_builder_get_object(builder, "grid_assign"));
 
 	btn_back1 = GTK_WIDGET(gtk_builder_get_object(builder, "btn_back1"));
 	btn_back2 = GTK_WIDGET(gtk_builder_get_object(builder, "btn_back2"));
@@ -233,7 +243,6 @@ void on_btn_save_user_clicked (GtkButton *b) {
 			gtk_label_set_text(GTK_LABEL(id_value), (const gchar*) id);
 			gtk_label_set_text(GTK_LABEL(password_value), (const gchar*) password);
 			gtk_entry_set_text(GTK_ENTRY(entry_name), (const gchar*) "");
-			printf("%s/n", "I am here");
 			gtk_widget_hide(window_user);
 			gtk_widget_show(window_user_added);
 		} else {
@@ -315,7 +324,40 @@ void on_btn_save_course_clicked(GtkButton *b) {
 	gtk_widget_show(window_course_added);	
 }
 
-void on_btn_main_menu1_clicked(GtkButton *b) {
+void on_assign_course_clicked (GtkButton *b) {
+	gtk_widget_hide(admin_main);
+	if(mysql_query(conn, "SELECT id, full_name FROM students")) {
+    	fprintf(stderr, "%s\n", mysql_error(conn)); 
+  	}
+  	res = mysql_store_result(conn);
+	int top = 1; 
+	while ((row = mysql_fetch_row(res)))
+	{
+		int left = 0;
+		gtk_grid_attach(GTK_GRID(grid_assign), gtk_label_new((const gchar*) row[left]), left, top, 1, 1);
+		left = left + 1;
+		gtk_grid_attach(GTK_GRID(grid_assign), gtk_label_new((const gchar*) row[left]), left, top, 1, 1);
+		left = left + 1;
+		button_action[top] = gtk_button_new_with_label((const gchar*) "Assign");
+		gtk_grid_attach(GTK_GRID(grid_assign), button_action[top], left, top, 1, 1);
+		g_signal_connect(button_action[top], "clicked", G_CALLBACK(on_assign_row_btn_clicked), (int)top);
+		top = top + 1;
+	}
+	gtk_widget_show_all(window_assign_course);
+}
+
+void on_assign_row_btn_clicked(GtkButton *b, int top) {
+	//printf("top=%d\n", top);
+	char student_id[7];
+	char student_name[128];
+	sprintf(student_id, "%s", gtk_label_get_text(GTK_LABEL(gtk_grid_get_child_at(grid_assign, 0, top))));
+	student_id[6] = '\0';
+	sprintf(student_name, "%s", gtk_label_get_text(GTK_LABEL(gtk_grid_get_child_at(grid_assign, 1, top))));
+	printf("%s\n", student_id);
+	printf("%s\n", student_name);
+}
+
+void on_btn_main_menu1_clicked(GtkButton *b) {	
 	gtk_widget_hide(window_course_added);
 	gtk_widget_show(admin_main);
 }
