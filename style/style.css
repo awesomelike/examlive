@@ -19,18 +19,29 @@
     font-family: 'Open Sans';
     font-weight: bold;
 }
-#start_quiz{
+#btn_ui{
     border: 0px solid;
     font-size: 20px;
     
     color: rgb(255, 255, 255);
     box-shadow: none;
     border-radius: 0px;
+  
 }
-#start_quiz:hover{
+#btn_ui:hover{
     border: 0px solid;
     font-size: 20px;
     color: rgb(61, 61, 61);
     box-shadow: none;
     border-radius: 0px;
+}
+#label_status{
+    color: rgb(31, 31, 31);
+    font-size: 16px;
+}
+#btn_save{
+    background-color: rgb(36, 173, 36);
+    color:white;
+    border-radius: 0px;
+
 }
