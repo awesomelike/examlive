@@ -66,6 +66,7 @@ GtkWidget	*btn_main_menu1;
 char user_type[1] = "S";
 char user_full_name[128];
 
+
 //Vars to store values from add course page
 char course_title[128];
 char course_pid[7];
@@ -138,6 +139,7 @@ void on_add_user_clicked (GtkButton *b) {
 	sprintf(user_type, "%s", "S");
 	sprintf(user_full_name, "%s", NULL);
 }
+
 //This temporary array and variable is to handle duplicate rows in the list store
 char ids[64][7];
 int row_count = 0;
