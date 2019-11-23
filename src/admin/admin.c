@@ -58,7 +58,7 @@ GtkWidget	*combo_course_professor;
 GtkWidget	*btn_save_course;
 GtkListStore *liststore2;
 
-GtkWidget	*window_assign_course;
+GtkWidget	*window_assign_course_table;
 GtkWidget	*grid_assign;
 GtkWidget	*button_action[500];
 
@@ -128,7 +128,7 @@ int main(int argc, char *argv[]) {
 	window_course_added = GTK_WIDGET(gtk_builder_get_object(builder, "window_course_added"));
 	btn_main_menu1 = GTK_WIDGET(gtk_builder_get_object(builder, "btn_main_menu1"));
 
-	window_assign_course = GTK_WIDGET(gtk_builder_get_object(builder, "window_assign_course"));
+	window_assign_course_table = GTK_WIDGET(gtk_builder_get_object(builder, "window_assign_course_table"));
 	grid_assign = GTK_WIDGET(gtk_builder_get_object(builder, "grid_assign"));
 
 	btn_back1 = GTK_WIDGET(gtk_builder_get_object(builder, "btn_back1"));
@@ -343,7 +343,7 @@ void on_assign_course_clicked (GtkButton *b) {
 		g_signal_connect(button_action[top], "clicked", G_CALLBACK(on_assign_row_btn_clicked), (int)top);
 		top = top + 1;
 	}
-	gtk_widget_show_all(window_assign_course);
+	gtk_widget_show_all(window_assign_course_table);
 }
 
 void on_assign_row_btn_clicked(GtkButton *b, int top) {
