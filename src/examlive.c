@@ -23,6 +23,9 @@ unsigned int port = 3306;
 static char* unix_socket = NULL;
 unsigned int flag = 0;
 
+MYSQL *conn;
+MYSQL_RES *res;
+MYSQL_ROW row;
 
 //GTK Login Page
 GtkWidget	*login_window;
@@ -43,11 +46,12 @@ GtkWidget *pr_swap_panel;
 int main(int argc, char *argv[]) {
 
 	//We refer to DB instance with this variable
-	MYSQL *conn;
 	conn = mysql_init(NULL);
 	if(!(mysql_real_connect(conn, host, user, pass, dbname, port, unix_socket, flag))) {
-		printf("%s\n", "Database connection error!");
-		return 0;
+		printf("%s\n", "some error there");
+		exit(1);
+	} else {
+		printf("%s\n", "DB conn established");
 	}
 	
 
@@ -92,8 +96,23 @@ int main(int argc, char *argv[]) {
 		
 	return 0;
 }
+int row_count;
 void on_sign_in_clicked  (GtkButton *b) {
-    gtk_widget_hide(login_window);
+
+	int num_rows;
+	
+	if(mysql_query(conn, "SELECT full_name FROM professors")) {
+		fprintf(stderr, "%s\n", mysql_error(conn)); 
+	}
+	res = mysql_store_result(conn);
+
+printf("MySQL Tables in mydb database:\n");
+ while ((row = mysql_fetch_row(res)) != NULL)
+ printf("%s \n", row[0]);
+
+	mysql_free_result(res);	
+
+	gtk_widget_hide(login_window);
 	gtk_widget_show(pr_window_panel);
 	
 }
