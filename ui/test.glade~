@@ -705,7 +705,7 @@
           </packing>
         </child>
         <child>
-          <object class="GtkButton">
+          <object class="GtkButton" id="leave_button">
             <property name="label" translatable="yes">Leave</property>
             <property name="name">leave_btn</property>
             <property name="width_request">231</property>
@@ -713,6 +713,7 @@
             <property name="visible">True</property>
             <property name="can_focus">True</property>
             <property name="receives_default">True</property>
+            <signal name="clicked" handler="on_leave_button_clicked" swapped="no"/>
           </object>
           <packing>
             <property name="x">-1</property>

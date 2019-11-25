@@ -2,7 +2,78 @@
 <!-- Generated with glade 3.22.1 -->
 <interface>
   <requires lib="gtk+" version="3.20"/>
-  <object class="GtkWindow">
+  <object class="GtkListStore" id="liststore1"/>
+  <object class="GtkWindow" id="login_window">
+    <property name="can_focus">False</property>
+    <property name="resizable">False</property>
+    <child>
+      <placeholder/>
+    </child>
+    <child>
+      <object class="GtkFixed" id="login_fixed">
+        <property name="visible">True</property>
+        <property name="can_focus">False</property>
+        <child>
+          <object class="GtkImage" id="login_image_1">
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <property name="pixbuf">../style/main_login.jpg</property>
+          </object>
+          <packing>
+            <property name="x">-1</property>
+            <property name="y">-1</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkEntry" id="login_password">
+            <property name="name">login_pwd</property>
+            <property name="width_request">190</property>
+            <property name="visible">True</property>
+            <property name="can_focus">True</property>
+            <property name="visibility">False</property>
+            <property name="invisible_char">*</property>
+            <property name="placeholder_text" translatable="yes">password</property>
+            <signal name="changed" handler="on_login_password_changed" swapped="no"/>
+          </object>
+          <packing>
+            <property name="x">538</property>
+            <property name="y">246</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkEntry" id="login_username">
+            <property name="name">login_usr</property>
+            <property name="width_request">190</property>
+            <property name="visible">True</property>
+            <property name="can_focus">True</property>
+            <property name="placeholder_text" translatable="yes">username</property>
+            <signal name="changed" handler="on_login_username_changed" swapped="no"/>
+          </object>
+          <packing>
+            <property name="x">538</property>
+            <property name="y">186</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkButton" id="sign_in">
+            <property name="label" translatable="yes">SIGN IN</property>
+            <property name="name">sign_in_btn</property>
+            <property name="width_request">100</property>
+            <property name="visible">True</property>
+            <property name="can_focus">True</property>
+            <property name="receives_default">True</property>
+            <property name="relief">none</property>
+            <signal name="clicked" handler="on_sign_in_clicked" swapped="no"/>
+          </object>
+          <packing>
+            <property name="x">568</property>
+            <property name="y">308</property>
+          </packing>
+        </child>
+      </object>
+    </child>
+  </object>
+  <object class="GtkWindow" id="pr_student_quiz">
     <property name="can_focus">False</property>
     <property name="resizable">False</property>
     <child>
@@ -98,77 +169,6 @@
           <packing>
             <property name="x">9</property>
             <property name="y">50</property>
-          </packing>
-        </child>
-      </object>
-    </child>
-  </object>
-  <object class="GtkListStore" id="liststore1"/>
-  <object class="GtkWindow" id="login_window">
-    <property name="can_focus">False</property>
-    <property name="resizable">False</property>
-    <child>
-      <placeholder/>
-    </child>
-    <child>
-      <object class="GtkFixed" id="login_fixed">
-        <property name="visible">True</property>
-        <property name="can_focus">False</property>
-        <child>
-          <object class="GtkImage" id="login_image_1">
-            <property name="visible">True</property>
-            <property name="can_focus">False</property>
-            <property name="pixbuf">../style/main_login.jpg</property>
-          </object>
-          <packing>
-            <property name="x">-1</property>
-            <property name="y">-1</property>
-          </packing>
-        </child>
-        <child>
-          <object class="GtkEntry" id="login_password">
-            <property name="name">login_pwd</property>
-            <property name="width_request">190</property>
-            <property name="visible">True</property>
-            <property name="can_focus">True</property>
-            <property name="visibility">False</property>
-            <property name="invisible_char">*</property>
-            <property name="placeholder_text" translatable="yes">password</property>
-            <signal name="changed" handler="on_login_password_changed" swapped="no"/>
-          </object>
-          <packing>
-            <property name="x">538</property>
-            <property name="y">246</property>
-          </packing>
-        </child>
-        <child>
-          <object class="GtkEntry" id="login_username">
-            <property name="name">login_usr</property>
-            <property name="width_request">190</property>
-            <property name="visible">True</property>
-            <property name="can_focus">True</property>
-            <property name="placeholder_text" translatable="yes">username</property>
-            <signal name="changed" handler="on_login_username_changed" swapped="no"/>
-          </object>
-          <packing>
-            <property name="x">538</property>
-            <property name="y">186</property>
-          </packing>
-        </child>
-        <child>
-          <object class="GtkButton" id="sign_in">
-            <property name="label" translatable="yes">SIGN IN</property>
-            <property name="name">sign_in_btn</property>
-            <property name="width_request">100</property>
-            <property name="visible">True</property>
-            <property name="can_focus">True</property>
-            <property name="receives_default">True</property>
-            <property name="relief">none</property>
-            <signal name="clicked" handler="on_sign_in_clicked" swapped="no"/>
-          </object>
-          <packing>
-            <property name="x">568</property>
-            <property name="y">308</property>
           </packing>
         </child>
       </object>
@@ -733,7 +733,7 @@
         <property name="visible">True</property>
         <property name="can_focus">False</property>
         <child>
-          <object class="GtkImage">
+          <object class="GtkImage" id="bck_img">
             <property name="width_request">100</property>
             <property name="height_request">80</property>
             <property name="visible">True</property>
@@ -762,11 +762,11 @@
                     <property name="can_focus">False</property>
                     <property name="label" translatable="yes">Available online quiz(es) </property>
                     <attributes>
-                      <attribute name="font-desc" value="Tibetan Machine Uni Bold 14"/>
+                      <attribute name="font-desc" value="Ubuntu Light 13"/>
                     </attributes>
                   </object>
                   <packing>
-                    <property name="x">183</property>
+                    <property name="x">202</property>
                     <property name="y">5</property>
                   </packing>
                 </child>
@@ -825,10 +825,11 @@
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <child>
-                  <object class="GtkEntry">
+                  <object class="GtkEntry" id="st_full_name">
                     <property name="width_request">220</property>
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
+                    <property name="placeholder_text" translatable="yes">Enter your Full name</property>
                   </object>
                   <packing>
                     <property name="x">288</property>
@@ -836,10 +837,13 @@
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkEntry">
+                  <object class="GtkEntry" id="st_current_pwd">
                     <property name="width_request">220</property>
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
+                    <property name="visibility">False</property>
+                    <property name="invisible_char">•</property>
+                    <property name="placeholder_text" translatable="yes">password...</property>
                   </object>
                   <packing>
                     <property name="x">288</property>
@@ -847,10 +851,11 @@
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkEntry">
+                  <object class="GtkEntry" id="st_new_password">
                     <property name="width_request">220</property>
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
+                    <property name="placeholder_text" translatable="yes">password...</property>
                   </object>
                   <packing>
                     <property name="x">288</property>

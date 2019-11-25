@@ -35,6 +35,7 @@ GtkWidget	*login_button;
 GtkWidget	*login_username;
 GtkWidget	*login_password;
 GtkBuilder	*builder; 
+GtkWidget	*st_window_panel;
 
 //GTK professor main panel Page
 GtkWidget *pr_window_panel;
@@ -65,6 +66,7 @@ int main(int argc, char *argv[]) {
 
 	login_window = GTK_WIDGET(gtk_builder_get_object(builder, "login_window"));
 	pr_window_panel=  GTK_WIDGET(gtk_builder_get_object(builder, "pr_window_panel"));
+	st_window_panel = GTK_WIDGET(gtk_builder_get_object(builder, "st_window_panel"));
 	
 	g_signal_connect(login_window, "destroy", G_CALLBACK(gtk_main_quit), NULL);
 
@@ -91,8 +93,8 @@ int main(int argc, char *argv[]) {
 
    
 
-	gtk_widget_show(login_window);
-
+	// gtk_widget_show(login_window);
+	gtk_widget_show(st_window_panel);
 
 	gtk_main();
 		
