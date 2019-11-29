@@ -35,13 +35,16 @@ GtkWidget	*login_button;
 GtkWidget	*login_username;
 GtkWidget	*login_password;
 GtkBuilder	*builder; 
+GtkWidget	*st_window_panel;
 
 //GTK professor main panel Page
 GtkWidget *pr_window_panel;
 GtkWidget *start_btn;
 GtkWidget *pr_swap_panel;
 
-
+//Login panel variables
+char user_id[128];
+char user_password[128];
 
 int main(int argc, char *argv[]) {
 
@@ -63,6 +66,7 @@ int main(int argc, char *argv[]) {
 
 	login_window = GTK_WIDGET(gtk_builder_get_object(builder, "login_window"));
 	pr_window_panel=  GTK_WIDGET(gtk_builder_get_object(builder, "pr_window_panel"));
+	st_window_panel = GTK_WIDGET(gtk_builder_get_object(builder, "st_window_panel"));
 	
 	g_signal_connect(login_window, "destroy", G_CALLBACK(gtk_main_quit), NULL);
 
@@ -89,33 +93,54 @@ int main(int argc, char *argv[]) {
 
    
 
-	gtk_widget_show(login_window);
-
+	// gtk_widget_show(login_window);
+	gtk_widget_show(st_window_panel);
 
 	gtk_main();
 		
 	return 0;
 }
 int row_count;
+gint x, y;
 void on_sign_in_clicked  (GtkButton *b) {
 
-	int num_rows;
-	
-	if(mysql_query(conn, "SELECT full_name FROM professors")) {
-		fprintf(stderr, "%s\n", mysql_error(conn)); 
-	}
-	res = mysql_store_result(conn);
+	printf("%s\n", user_id);
+	printf("%s\n", user_password);
 
-printf("MySQL Tables in mydb database:\n");
- while ((row = mysql_fetch_row(res)) != NULL)
- printf("%s \n", row[0]);
-
-	mysql_free_result(res);	
-
+//pr windows current position state
+	// gtk_window_get_position(login_window, &x, &y);
+	// gtk_window_move (pr_window_panel,x,y);
+	// gtk_window_move (login_window,x,y);
+	// 	printf("current position SIGN IN PAGE is:\nx: %i\ny:%i\n", x, y);
+ //window switches
 	gtk_widget_hide(login_window);
 	gtk_widget_show(pr_window_panel);
+
 	
 }
 void on_pr_start_quiz_clicked (GtkButton *c){
 	
+}
+void on_login_username_changed(GtkEntry *e){
+	
+	sprintf(user_id, "%s", gtk_entry_get_text(e));
+
+	
+}
+
+void on_login_password_changed (GtkEntry *p ){
+
+	sprintf(user_password, "%s", gtk_entry_get_text(p));
+}
+
+void on_leave_button_clicked(GtkButton *b){
+
+//pr windows current position state
+	// gtk_window_get_position(pr_window_panel, &x, &y);
+	// gtk_window_move (login_window, x , y);
+	
+//window switches
+	gtk_widget_hide(pr_window_panel) ;
+	gtk_widget_show(login_window);
+
 }

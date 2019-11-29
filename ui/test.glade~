@@ -4,6 +4,7 @@
   <requires lib="gtk+" version="3.20"/>
   <object class="GtkWindow">
     <property name="can_focus">False</property>
+    <property name="resizable">False</property>
     <child>
       <placeholder/>
     </child>
@@ -19,6 +20,85 @@
             <property name="can_focus">False</property>
             <property name="pixbuf">../style/quiz_process.jpg</property>
           </object>
+        </child>
+        <child>
+          <object class="GtkButton">
+            <property name="label" translatable="yes">Finish Quiz</property>
+            <property name="width_request">200</property>
+            <property name="height_request">50</property>
+            <property name="visible">True</property>
+            <property name="can_focus">True</property>
+            <property name="receives_default">True</property>
+          </object>
+          <packing>
+            <property name="x">341</property>
+            <property name="y">416</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkLabel">
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <property name="label" translatable="yes">System Analysis</property>
+          </object>
+          <packing>
+            <property name="x">379</property>
+            <property name="y">15</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkScrolledWindow">
+            <property name="width_request">880</property>
+            <property name="height_request">350</property>
+            <property name="visible">True</property>
+            <property name="can_focus">True</property>
+            <property name="shadow_type">in</property>
+            <child>
+              <object class="GtkViewport">
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+                <child>
+                  <object class="GtkGrid">
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <property name="row_spacing">1</property>
+                    <property name="row_homogeneous">True</property>
+                    <child>
+                      <placeholder/>
+                    </child>
+                    <child>
+                      <placeholder/>
+                    </child>
+                    <child>
+                      <placeholder/>
+                    </child>
+                    <child>
+                      <placeholder/>
+                    </child>
+                    <child>
+                      <placeholder/>
+                    </child>
+                    <child>
+                      <placeholder/>
+                    </child>
+                    <child>
+                      <placeholder/>
+                    </child>
+                    <child>
+                      <placeholder/>
+                    </child>
+                    <child>
+                      <placeholder/>
+                    </child>
+                  </object>
+                </child>
+              </object>
+            </child>
+          </object>
+          <packing>
+            <property name="x">9</property>
+            <property name="y">50</property>
+          </packing>
         </child>
       </object>
     </child>
@@ -54,6 +134,7 @@
             <property name="visibility">False</property>
             <property name="invisible_char">*</property>
             <property name="placeholder_text" translatable="yes">password</property>
+            <signal name="changed" handler="on_login_password_changed" swapped="no"/>
           </object>
           <packing>
             <property name="x">538</property>
@@ -67,6 +148,7 @@
             <property name="visible">True</property>
             <property name="can_focus">True</property>
             <property name="placeholder_text" translatable="yes">username</property>
+            <signal name="changed" handler="on_login_username_changed" swapped="no"/>
           </object>
           <packing>
             <property name="x">538</property>
@@ -209,7 +291,13 @@
                     <property name="can_focus">True</property>
                     <property name="shadow_type">in</property>
                     <child>
-                      <placeholder/>
+                      <object class="GtkViewport">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <child>
+                          <placeholder/>
+                        </child>
+                      </object>
                     </child>
                   </object>
                   <packing>
@@ -271,7 +359,66 @@
                       </packing>
                     </child>
                     <child>
+                      <object class="GtkEntry">
+                        <property name="visible">True</property>
+                        <property name="can_focus">True</property>
+                        <property name="placeholder_text" translatable="yes">your answer </property>
+                      </object>
+                      <packing>
+                        <property name="left_attach">0</property>
+                        <property name="top_attach">1</property>
+                      </packing>
+                    </child>
+                    <child>
                       <object class="GtkCheckButton">
+                        <property name="label" translatable="yes">Correct Answer</property>
+                        <property name="visible">True</property>
+                        <property name="can_focus">True</property>
+                        <property name="receives_default">False</property>
+                        <property name="draw_indicator">True</property>
+                      </object>
+                      <packing>
+                        <property name="left_attach">1</property>
+                        <property name="top_attach">2</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkCheckButton">
+                        <property name="label" translatable="yes">Correct Answer</property>
+                        <property name="visible">True</property>
+                        <property name="can_focus">True</property>
+                        <property name="receives_default">False</property>
+                        <property name="draw_indicator">True</property>
+                      </object>
+                      <packing>
+                        <property name="left_attach">1</property>
+                        <property name="top_attach">3</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkEntry">
+                        <property name="visible">True</property>
+                        <property name="can_focus">True</property>
+                        <property name="placeholder_text" translatable="yes">your answer </property>
+                      </object>
+                      <packing>
+                        <property name="left_attach">0</property>
+                        <property name="top_attach">2</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkEntry">
+                        <property name="visible">True</property>
+                        <property name="can_focus">True</property>
+                        <property name="placeholder_text" translatable="yes">your answer </property>
+                      </object>
+                      <packing>
+                        <property name="left_attach">0</property>
+                        <property name="top_attach">3</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkRadioButton">
                         <property name="label" translatable="yes">Correct Answer</property>
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
@@ -284,75 +431,17 @@
                       </packing>
                     </child>
                     <child>
-                      <object class="GtkEntry">
-                        <property name="visible">True</property>
-                        <property name="can_focus">True</property>
-                        <property name="placeholder_text" translatable="yes">your answer </property>
-                      </object>
-                      <packing>
-                        <property name="left_attach">0</property>
-                        <property name="top_attach">1</property>
-                      </packing>
-                    </child>
-                    <child>
-                      <object class="GtkCheckButton">
+                      <object class="GtkRadioButton">
                         <property name="label" translatable="yes">Correct Answer</property>
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
                         <property name="receives_default">False</property>
+                        <property name="active">True</property>
                         <property name="draw_indicator">True</property>
                       </object>
                       <packing>
                         <property name="left_attach">1</property>
                         <property name="top_attach">1</property>
-                      </packing>
-                    </child>
-                    <child>
-                      <object class="GtkCheckButton">
-                        <property name="label" translatable="yes">Correct Answer</property>
-                        <property name="visible">True</property>
-                        <property name="can_focus">True</property>
-                        <property name="receives_default">False</property>
-                        <property name="draw_indicator">True</property>
-                      </object>
-                      <packing>
-                        <property name="left_attach">1</property>
-                        <property name="top_attach">2</property>
-                      </packing>
-                    </child>
-                    <child>
-                      <object class="GtkCheckButton">
-                        <property name="label" translatable="yes">Correct Answer</property>
-                        <property name="visible">True</property>
-                        <property name="can_focus">True</property>
-                        <property name="receives_default">False</property>
-                        <property name="draw_indicator">True</property>
-                      </object>
-                      <packing>
-                        <property name="left_attach">1</property>
-                        <property name="top_attach">3</property>
-                      </packing>
-                    </child>
-                    <child>
-                      <object class="GtkEntry">
-                        <property name="visible">True</property>
-                        <property name="can_focus">True</property>
-                        <property name="placeholder_text" translatable="yes">your answer </property>
-                      </object>
-                      <packing>
-                        <property name="left_attach">0</property>
-                        <property name="top_attach">2</property>
-                      </packing>
-                    </child>
-                    <child>
-                      <object class="GtkEntry">
-                        <property name="visible">True</property>
-                        <property name="can_focus">True</property>
-                        <property name="placeholder_text" translatable="yes">your answer </property>
-                      </object>
-                      <packing>
-                        <property name="left_attach">0</property>
-                        <property name="top_attach">3</property>
                       </packing>
                     </child>
                   </object>
@@ -424,6 +513,18 @@
               <object class="GtkFixed" id="pr_history_quiz">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
+                <child>
+                  <object class="GtkLabel">
+                    <property name="width_request">100</property>
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <property name="label" translatable="yes">System analysis</property>
+                  </object>
+                  <packing>
+                    <property name="x">12</property>
+                    <property name="y">15</property>
+                  </packing>
+                </child>
               </object>
               <packing>
                 <property name="name">page2</property>
@@ -569,6 +670,54 @@
           <packing>
             <property name="x">-1</property>
             <property name="y">129</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkLabel">
+            <property name="width_request">100</property>
+            <property name="height_request">80</property>
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <property name="label" translatable="yes">ANDREY DRAGUNOV</property>
+            <attributes>
+              <attribute name="font-desc" value="Sans Bold 14"/>
+              <attribute name="foreground" value="#ffffffffffff"/>
+            </attributes>
+          </object>
+          <packing>
+            <property name="x">8</property>
+            <property name="y">-17</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkLabel">
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <property name="label" translatable="yes">P00323</property>
+            <attributes>
+              <attribute name="font-desc" value="Sans 12"/>
+              <attribute name="foreground" value="#ffffffffffff"/>
+            </attributes>
+          </object>
+          <packing>
+            <property name="x">8</property>
+            <property name="y">38</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkButton" id="leave_button">
+            <property name="label" translatable="yes">Leave</property>
+            <property name="name">leave_btn</property>
+            <property name="width_request">231</property>
+            <property name="height_request">40</property>
+            <property name="visible">True</property>
+            <property name="can_focus">True</property>
+            <property name="receives_default">True</property>
+            <signal name="clicked" handler="on_leave_button_clicked" swapped="no"/>
+          </object>
+          <packing>
+            <property name="x">-1</property>
+            <property name="y">460</property>
           </packing>
         </child>
       </object>
