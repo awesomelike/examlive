@@ -94,7 +94,7 @@ int main(int argc, char *argv[]) {
    
 
 	// gtk_widget_show(login_window);
-	gtk_widget_show(st_window_panel);
+	gtk_widget_show(login_window);
 
 	gtk_main();
 		
