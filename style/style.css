@@ -45,3 +45,22 @@
     border-radius: 0px;
 
 }
+#leave_btn{
+    
+    background: transparent;
+    border: none;
+    color: #FFFFFF;
+    font-size: 20px;
+    border-radius: 0;
+    box-shadow: none;
+
+  }
+  #leave_btn:hover{
+    
+    background-color: #e02721;
+    border: none;
+    color: rgb(216, 212, 212);
+    font-size: 20px;
+    border-radius: 0;
+
+  }
