@@ -127,14 +127,14 @@ int row_count;
 gint x, y;
 void on_sign_in_clicked  (GtkButton *b) {
 
-	printf("%s\n", user_id);
-	printf("%s\n", user_password);
+	//printf("%s\n", user_id);
+	//printf("%s\n", user_password);
 	char sql_select[1024];
 	
 	if(user_id[0]=='P') 
 	{
 		sprintf(sql_select, "SELECT id, full_name FROM professors WHERE id='%s' AND password='%s'", user_id, user_password);
-		printf("%s\n", sql_select);
+		//printf("%s\n", sql_select);
 		if(mysql_query(conn, sql_select)) {
     		fprintf(stderr, "%s\n", mysql_error(conn));
 			printf("%s\n", "User does not exist!");

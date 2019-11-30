@@ -180,7 +180,7 @@
             </attributes>
           </object>
           <packing>
-            <property name="x">549</property>
+            <property name="x">538</property>
             <property name="y">347</property>
           </packing>
         </child>
