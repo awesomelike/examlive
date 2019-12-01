@@ -94,6 +94,10 @@ int num_courses_assigned = 0;
 //Vars to store list of courses with checkboxes
 int course_id_to_be_assigned[100];
 int course_assigned_index = 0;
+//CSS values
+GtkCssProvider  *provider;
+GdkScreen       *screen;
+GdkDisplay      *display;
 
 //Function prototypes
 void on_assign_row_btn_clicked(GtkButton*, int); 
@@ -159,6 +163,14 @@ int main(int argc, char *argv[]) {
 	name_label_value = GTK_WIDGET(gtk_builder_get_object(builder, "name_label_value"));
 	grid_course_checkbox = GTK_WIDGET(gtk_builder_get_object(builder, "grid_course_checkbox"));
 
+		//These lines used to connect CSS
+    provider = gtk_css_provider_new();
+    display = gdk_display_get_default();
+    screen = gdk_display_get_default_screen (display);
+    gtk_style_context_add_provider_for_screen (screen, GTK_STYLE_PROVIDER(provider), GTK_STYLE_PROVIDER_PRIORITY_USER);
+    gtk_css_provider_load_from_path(GTK_CSS_PROVIDER(provider),"style.css",NULL);
+
+   
 	btn_back1 = GTK_WIDGET(gtk_builder_get_object(builder, "btn_back1"));
 	btn_back2 = GTK_WIDGET(gtk_builder_get_object(builder, "btn_back2"));
 	gtk_widget_show(admin_main);
@@ -177,6 +189,12 @@ void on_add_user_clicked (GtkButton *b) {
 	sprintf(user_full_name, "%s", NULL);
 }
 
+//back to menu handler
+void on_backToManu_clicked (GtkButton *b){
+  gtk_widget_hide(window_assign_course_table);
+	gtk_widget_show(admin_main);
+
+}
 //This temporary array and variable is to handle duplicate rows in the list store
 char ids[64][7];
 int row_count = 0;
@@ -364,6 +382,7 @@ void get_students_table() {
 		gtk_grid_attach(GTK_GRID(grid_assign_table), gtk_label_new((const gchar*) row[left]), left, top, 1, 1);
 		left = left + 1;
 		button_action[top] = gtk_button_new_with_label((const gchar*) "Assign");
+		gtk_widget_set_name (button_action[top], (const gchar*)("course_table_btn"));
 		gtk_grid_attach(GTK_GRID(grid_assign_table), button_action[top], left, top, 1, 1);
 		g_signal_connect(button_action[top], "clicked", G_CALLBACK(on_assign_row_btn_clicked), (int)top);
 		top = top + 1;
