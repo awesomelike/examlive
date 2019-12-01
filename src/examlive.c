@@ -294,16 +294,6 @@ void on_btn_add_question_clicked (GtkButton *b) {
   	}
 	int question_id = mysql_insert_id(conn);
 	
-	num_questions = num_questions + 1;
-	gtk_entry_set_text(GTK_ENTRY(entry_question), (const gchar*) "");
-	gtk_entry_set_text(GTK_ENTRY(entry_answer_a), (const gchar*) "");
-	gtk_entry_set_text(GTK_ENTRY(entry_answer_b), (const gchar*) "");
-	gtk_entry_set_text(GTK_ENTRY(entry_answer_c), (const gchar*) "");
-	gtk_entry_set_text(GTK_ENTRY(entry_answer_d), (const gchar*) "");
-	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(radio_a), TRUE);
-	char text[16];
-	snprintf (text, sizeof(text), "%d",num_questions);
-	gtk_label_set_text(GTK_LABEL(label_num_questions), (const gchar*) text); 
 	sprintf(sql_insert, "INSERT INTO choices(question_id, letter, choice_value, is_correct) VALUES(%d, 'A', '%s', %d)", 
 			question_id,  
 			gtk_entry_get_text(entry_answer_a), 
@@ -324,6 +314,16 @@ void on_btn_add_question_clicked (GtkButton *b) {
 			gtk_entry_get_text(entry_answer_d), 
 			gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(radio_d)) ? 1 : 0);
 	if(mysql_query(conn, sql_insert)){fprintf(stderr, "%s\n", mysql_error(conn));}
+	num_questions = num_questions + 1;
+	gtk_entry_set_text(GTK_ENTRY(entry_question), (const gchar*) "");
+	gtk_entry_set_text(GTK_ENTRY(entry_answer_a), (const gchar*) "");
+	gtk_entry_set_text(GTK_ENTRY(entry_answer_b), (const gchar*) "");
+	gtk_entry_set_text(GTK_ENTRY(entry_answer_c), (const gchar*) "");
+	gtk_entry_set_text(GTK_ENTRY(entry_answer_d), (const gchar*) "");
+	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(radio_a), TRUE);
+	char text[16];
+	snprintf (text, sizeof(text), "%d",num_questions);
+	gtk_label_set_text(GTK_LABEL(label_num_questions), (const gchar*) text); 
 
 }
 
