@@ -6,7 +6,7 @@ DEBUG=-g
 
 OPT=-O0
 
-WARN=-W
+WARN=-w
  
 PTHREAD=-pthread -lpthread
  

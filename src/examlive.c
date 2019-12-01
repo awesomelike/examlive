@@ -37,12 +37,30 @@ GtkWidget	*login_password;
 GtkBuilder	*builder; 
 GtkWidget   *login_label_error;
 
-//GTK professor main panel Page
+//GTK professor main panel
 GtkWidget *pr_window_panel;
 GtkWidget *start_btn;
 GtkWidget *pr_swap_panel;
 GtkWidget *label_prof_name;
 GtkWidget *label_prof_id;
+
+//GTK professor create quiz
+GtkWidget *entry_exam_title;
+GtkWidget *combo_course;
+GtkWidget *liststore2;
+GtkWidget *label_num_questions;
+GtkWidget *entry_question;
+GtkWidget *grid_create_answers;
+GtkWidget *entry_answer_a;
+GtkWidget *entry_answer_b;
+GtkWidget *entry_answer_c;
+GtkWidget *entry_answer_d;
+GtkWidget *radio_a;
+GtkWidget *radio_b;
+GtkWidget *radio_c;
+GtkWidget *radio_d;
+GtkWidget *btn_add_question;
+GtkWidget *btn_save_exam;
 
 GtkWidget *st_window_panel;
 GtkWidget *st_name;
@@ -60,7 +78,15 @@ struct User
 	char full_name[128];
 };
 
+struct Exam 
+{
+	int course_id;
+	char prof_id[7];
+	char title[128];
+};
+
 static struct User user_obj;
+static struct Exam exam_obj;
 
 int main(int argc, char *argv[]) {
 
@@ -101,11 +127,29 @@ int main(int argc, char *argv[]) {
 	label_prof_name = GTK_WIDGET(gtk_builder_get_object(builder, "label_prof_name"));
 	label_prof_id = GTK_WIDGET(gtk_builder_get_object(builder, "label_prof_id"));
 
+	//declare variable professor create quiz
+	entry_exam_title = GTK_WIDGET(gtk_builder_get_object(builder, "entry_exam_title"));
+	combo_course = GTK_WIDGET(gtk_builder_get_object(builder, "combo_course"));
+	liststore2 = GTK_LIST_STORE(gtk_builder_get_object(builder, "liststore2"));
+	entry_question = GTK_WIDGET(gtk_builder_get_object(builder, "entry_question"));
+	grid_create_answers = GTK_WIDGET(gtk_builder_get_object(builder, "grid_create_answers"));
+	entry_answer_a = GTK_WIDGET(gtk_builder_get_object(builder, "entry_answer_a"));
+	entry_answer_b = GTK_WIDGET(gtk_builder_get_object(builder, "entry_answer_b"));
+	entry_answer_c = GTK_WIDGET(gtk_builder_get_object(builder, "entry_answer_c"));
+	entry_answer_d = GTK_WIDGET(gtk_builder_get_object(builder, "entry_answer_d"));
+	radio_a = GTK_WIDGET(gtk_builder_get_object(builder, "radio_a"));
+	radio_b = GTK_WIDGET(gtk_builder_get_object(builder, "radio_b"));
+	radio_c = GTK_WIDGET(gtk_builder_get_object(builder, "radio_c"));
+	radio_d = GTK_WIDGET(gtk_builder_get_object(builder, "radio_d"));
+	btn_add_question = GTK_WIDGET(gtk_builder_get_object(builder, "btn_add_question"));
+	btn_save_exam = GTK_WIDGET(gtk_builder_get_object(builder, "btn_save_exam"));
+
 	//declare variable student panel
 	st_window_panel = GTK_WIDGET(gtk_builder_get_object(builder, "st_window_panel"));
 	st_id = GTK_WIDGET(gtk_builder_get_object(builder, "st_id"));
 	st_name = GTK_WIDGET(gtk_builder_get_object(builder, "st_name"));
 	label_button_student = GTK_WIDGET(gtk_builder_get_object(builder, "leave_button_student"));
+
 
 	//These lines used to connect CSS
     provider = gtk_css_provider_new();
@@ -113,11 +157,12 @@ int main(int argc, char *argv[]) {
     screen = gdk_display_get_default_screen (display);
     gtk_style_context_add_provider_for_screen (screen, GTK_STYLE_PROVIDER(provider), GTK_STYLE_PROVIDER_PRIORITY_USER);
     gtk_css_provider_load_from_path(GTK_CSS_PROVIDER(provider),"style/style.css",NULL);
-
    
-
+	gtk_widget_hide(entry_question);
+	gtk_widget_hide(grid_create_answers);
+	gtk_widget_set_sensitive(btn_add_question, FALSE);
+	gtk_widget_set_sensitive(btn_save_exam, FALSE);
     gtk_widget_show(login_window);
-	//gtk_widget_show(st_window_panel);
 
 	gtk_main();
 		
@@ -150,16 +195,23 @@ void on_sign_in_clicked  (GtkButton *b) {
 			row = mysql_fetch_row(res);
 			strcpy(user_obj.id, row[0]);
 			strcpy(user_obj.full_name, row[1]);
+			mysql_free_result(res);
+			sprintf(sql_select, "SELECT courses.id, courses.title AS course_id FROM teach JOIN courses ON teach.course_id=courses.id WHERE teach.id='%s'", user_obj.id);
+			if(mysql_query(conn, sql_select)) {
+    			fprintf(stderr, "%s\n", mysql_error(conn));
+  			}
+  			res = mysql_store_result(conn);
+			while ((row = mysql_fetch_row(res)))
+			{
+				gtk_list_store_insert_with_values(liststore2, NULL, -1, 0, row[0], 1, row[1]);	
+			}
+			
 			gtk_label_set_text(GTK_LABEL(label_prof_id), (const gchar*) user_obj.id);
 			gtk_label_set_text(GTK_LABEL(label_prof_name), (const gchar*) user_obj.full_name);
 			gtk_label_set_text(GTK_LABEL(login_label_error), (const gchar*) "");
-			mysql_free_result(res);
 			gtk_widget_hide(login_window);
 			gtk_widget_show(pr_window_panel);	
-		}
-		  
-		
-		
+		}		
 	} else if (user_id[0]=='S')
 	{
 		sprintf(sql_select, "SELECT id, full_name FROM students WHERE id='%s' AND password='%s'", user_id, user_password);
@@ -188,10 +240,6 @@ void on_sign_in_clicked  (GtkButton *b) {
 			gtk_widget_show(st_window_panel);	
 		}
 	}
-	
-	
-
-
 //pr windows current position state
 	// gtk_window_get_position(login_window, &x, &y);
 	// gtk_window_move (pr_window_panel,x,y);
@@ -202,12 +250,30 @@ void on_sign_in_clicked  (GtkButton *b) {
 void on_pr_start_quiz_clicked (GtkButton *c){
 	
 }
+
+
 void on_login_username_changed(GtkEntry *e){
 	sprintf(user_id, "%s", gtk_entry_get_text(e));
 }
 
 void on_login_password_changed (GtkEntry *p ){
 	sprintf(user_password, "%s", gtk_entry_get_text(p));
+}
+
+void on_combo_course_changed (GtkComboBox *c) {
+	//printf("%s\n", gtk_combo_box_get_active_id(combo_course));
+	//sprintf(exam_obj.course_id, gtk_combo_box_get_active_id(combo_course));
+	exam_obj.course_id = atoi(gtk_combo_box_get_active_id(combo_course));
+	printf("%d\n", exam_obj.course_id);
+}
+void on_entry_exam_title_activate (GtkEntry *e) {
+	printf("%s\n", gtk_entry_get_text(e));
+	gtk_combo_box_set_button_sensitivity(GTK_COMBO_BOX(combo_course), GTK_SENSITIVITY_OFF);
+	gtk_editable_set_editable(GTK_EDITABLE(e), FALSE);
+	gtk_widget_set_sensitive(btn_add_question, TRUE);
+	gtk_widget_set_sensitive(btn_save_exam, TRUE);
+	gtk_widget_show(entry_question);
+	gtk_widget_show(grid_create_answers);
 }
 
 void on_leave_button_clicked(GtkButton *b){
