@@ -16,66 +16,61 @@
         <property name="can_focus">False</property>
         <property name="can_default">True</property>
         <child>
-          <object class="GtkLabel" id="label_main">
-            <property name="width_request">178</property>
-            <property name="height_request">30</property>
+          <object class="GtkImage">
+            <property name="width_request">600</property>
+            <property name="height_request">600</property>
             <property name="visible">True</property>
             <property name="can_focus">False</property>
-            <property name="halign">center</property>
-            <property name="label" translatable="yes">ExamLive Admin</property>
-            <attributes>
-              <attribute name="font-desc" value="Open Sans Bold 28"/>
-            </attributes>
+            <property name="pixbuf">../style/Admin Panel.jpg</property>
           </object>
-          <packing>
-            <property name="x">178</property>
-            <property name="y">23</property>
-          </packing>
         </child>
         <child>
           <object class="GtkButton" id="add_user">
             <property name="label" translatable="yes">Add  user</property>
-            <property name="width_request">105</property>
-            <property name="height_request">105</property>
+            <property name="name">admin_main_btn</property>
+            <property name="width_request">260</property>
+            <property name="height_request">70</property>
             <property name="visible">True</property>
             <property name="can_focus">True</property>
             <property name="receives_default">True</property>
             <signal name="clicked" handler="on_add_user_clicked" swapped="no"/>
           </object>
           <packing>
-            <property name="x">142</property>
-            <property name="y">168</property>
+            <property name="x">168</property>
+            <property name="y">138</property>
           </packing>
         </child>
         <child>
           <object class="GtkButton" id="add_course">
             <property name="label" translatable="yes">Add course</property>
-            <property name="width_request">105</property>
-            <property name="height_request">105</property>
+            <property name="name">admin_main_btn</property>
+            <property name="width_request">260</property>
+            <property name="height_request">70</property>
             <property name="visible">True</property>
             <property name="can_focus">True</property>
             <property name="receives_default">True</property>
             <signal name="clicked" handler="on_add_course_clicked" swapped="no"/>
           </object>
           <packing>
-            <property name="x">391</property>
-            <property name="y">168</property>
+            <property name="x">168</property>
+            <property name="y">255</property>
           </packing>
         </child>
         <child>
           <object class="GtkButton" id="assign_course">
             <property name="label" translatable="yes">Assign 
 course</property>
-            <property name="width_request">105</property>
-            <property name="height_request">105</property>
+            <property name="name">admin_main_btn</property>
+            <property name="width_request">260</property>
+            <property name="height_request">70</property>
             <property name="visible">True</property>
             <property name="can_focus">True</property>
             <property name="receives_default">True</property>
             <signal name="clicked" handler="on_assign_course_clicked" swapped="no"/>
           </object>
           <packing>
-            <property name="x">266</property>
-            <property name="y">350</property>
+            <property name="x">168</property>
+            <property name="y">376</property>
           </packing>
         </child>
       </object>
@@ -111,6 +106,15 @@ course</property>
         <property name="visible">True</property>
         <property name="can_focus">False</property>
         <child>
+          <object class="GtkImage">
+            <property name="width_request">600</property>
+            <property name="height_request">600</property>
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <property name="pixbuf">../style/Admin Panel.jpg</property>
+          </object>
+        </child>
+        <child>
           <object class="GtkButton" id="btn_back1">
             <property name="label">gtk-go-back</property>
             <property name="visible">True</property>
@@ -127,19 +131,18 @@ course</property>
         </child>
         <child>
           <object class="GtkLabel" id="label_usr_type">
-            <property name="width_request">100</property>
-            <property name="height_request">80</property>
             <property name="visible">True</property>
             <property name="can_focus">False</property>
             <property name="label" translatable="yes">User type</property>
           </object>
           <packing>
-            <property name="y">53</property>
+            <property name="x">54</property>
+            <property name="y">123</property>
           </packing>
         </child>
         <child>
           <object class="GtkComboBox" id="combo1">
-            <property name="width_request">167</property>
+            <property name="width_request">250</property>
             <property name="visible">True</property>
             <property name="can_focus">False</property>
             <property name="model">liststore1</property>
@@ -157,20 +160,20 @@ course</property>
             </child>
           </object>
           <packing>
-            <property name="x">103</property>
-            <property name="y">77</property>
+            <property name="x">143</property>
+            <property name="y">117</property>
           </packing>
         </child>
         <child>
           <object class="GtkLabel" id="label_name">
             <property name="width_request">100</property>
-            <property name="height_request">80</property>
             <property name="visible">True</property>
             <property name="can_focus">False</property>
             <property name="label" translatable="yes">Full name</property>
           </object>
           <packing>
-            <property name="y">107</property>
+            <property name="x">35</property>
+            <property name="y">192</property>
           </packing>
         </child>
         <child>
@@ -183,14 +186,15 @@ course</property>
             <signal name="changed" handler="on_entry_name_changed" swapped="no"/>
           </object>
           <packing>
-            <property name="x">103</property>
-            <property name="y">133</property>
+            <property name="x">142</property>
+            <property name="y">186</property>
           </packing>
         </child>
         <child>
           <object class="GtkButton" id="btn_save_user">
             <property name="label">gtk-add</property>
-            <property name="width_request">100</property>
+            <property name="width_request">200</property>
+            <property name="height_request">49</property>
             <property name="visible">True</property>
             <property name="can_focus">True</property>
             <property name="receives_default">True</property>
@@ -199,8 +203,8 @@ course</property>
             <signal name="clicked" handler="on_btn_save_user_clicked" swapped="no"/>
           </object>
           <packing>
-            <property name="x">250</property>
-            <property name="y">381</property>
+            <property name="x">176</property>
+            <property name="y">319</property>
           </packing>
         </child>
       </object>
@@ -226,6 +230,15 @@ course</property>
         <property name="visible">True</property>
         <property name="can_focus">False</property>
         <child>
+          <object class="GtkImage">
+            <property name="width_request">600</property>
+            <property name="height_request">600</property>
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <property name="pixbuf">../style/Admin Panel.jpg</property>
+          </object>
+        </child>
+        <child>
           <object class="GtkButton" id="btn_back2">
             <property name="label">gtk-go-back</property>
             <property name="visible">True</property>
@@ -247,8 +260,8 @@ course</property>
             <property name="label" translatable="yes">Course title: </property>
           </object>
           <packing>
-            <property name="x">24</property>
-            <property name="y">97</property>
+            <property name="x">29</property>
+            <property name="y">96</property>
           </packing>
         </child>
         <child>
@@ -258,8 +271,8 @@ course</property>
             <property name="label" translatable="yes">Professor:</property>
           </object>
           <packing>
-            <property name="x">24</property>
-            <property name="y">147</property>
+            <property name="x">38</property>
+            <property name="y">159</property>
           </packing>
         </child>
         <child>
@@ -270,7 +283,7 @@ course</property>
             <signal name="changed" handler="on_entry_course_title_changed" swapped="no"/>
           </object>
           <packing>
-            <property name="x">125</property>
+            <property name="x">138</property>
             <property name="y">92</property>
           </packing>
         </child>
@@ -292,14 +305,15 @@ course</property>
             </child>
           </object>
           <packing>
-            <property name="x">125</property>
-            <property name="y">144</property>
+            <property name="x">137</property>
+            <property name="y">153</property>
           </packing>
         </child>
         <child>
           <object class="GtkButton" id="btn_save_course">
             <property name="label">gtk-add</property>
-            <property name="width_request">100</property>
+            <property name="width_request">200</property>
+            <property name="height_request">49</property>
             <property name="visible">True</property>
             <property name="can_focus">True</property>
             <property name="receives_default">True</property>
@@ -308,8 +322,8 @@ course</property>
             <signal name="clicked" handler="on_btn_save_course_clicked" swapped="no"/>
           </object>
           <packing>
-            <property name="x">250</property>
-            <property name="y">381</property>
+            <property name="x">197</property>
+            <property name="y">249</property>
           </packing>
         </child>
       </object>
@@ -326,6 +340,15 @@ course</property>
       <object class="GtkFixed" id="fixed_assign_course">
         <property name="visible">True</property>
         <property name="can_focus">False</property>
+        <child>
+          <object class="GtkImage">
+            <property name="width_request">600</property>
+            <property name="height_request">600</property>
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <property name="pixbuf">../style/Admin Panel empty.jpg</property>
+          </object>
+        </child>
         <child>
           <object class="GtkScrolledWindow" id="scrolled_view2">
             <property name="width_request">600</property>
@@ -397,17 +420,18 @@ course</property>
         <child>
           <object class="GtkGrid" id="grid_details">
             <property name="width_request">600</property>
-            <property name="height_request">100</property>
+            <property name="height_request">0</property>
             <property name="visible">True</property>
             <property name="can_focus">False</property>
+            <property name="row_spacing">3</property>
             <child>
               <object class="GtkLabel" id="id_label">
-                <property name="height_request">50</property>
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
-                <property name="label" translatable="yes">ID:</property>
+                <property name="label" translatable="yes">     ID:</property>
                 <attributes>
                   <attribute name="font-desc" value="Sans Bold 14"/>
+                  <attribute name="foreground" value="#eeeeeeeeecec"/>
                 </attributes>
               </object>
               <packing>
@@ -423,6 +447,7 @@ course</property>
                 <property name="label" translatable="yes">NAME:</property>
                 <attributes>
                   <attribute name="font-desc" value="Sans Bold 14"/>
+                  <attribute name="foreground" value="#eeeeeeeeecec"/>
                 </attributes>
               </object>
               <packing>
@@ -432,6 +457,7 @@ course</property>
             </child>
             <child>
               <object class="GtkLabel" id="id_label_value">
+                <property name="name">st_value</property>
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="label" translatable="yes">label</property>
@@ -443,6 +469,7 @@ course</property>
             </child>
             <child>
               <object class="GtkLabel" id="name_label_value">
+                <property name="name">st_value</property>
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="label" translatable="yes">label</property>
@@ -453,11 +480,16 @@ course</property>
               </packing>
             </child>
           </object>
+          <packing>
+            <property name="y">15</property>
+          </packing>
         </child>
         <child>
           <object class="GtkButton" id="btn_course_assign_save">
             <property name="label">gtk-apply</property>
-            <property name="width_request">100</property>
+            <property name="name">btn_save_course</property>
+            <property name="width_request">200</property>
+            <property name="height_request">49</property>
             <property name="visible">True</property>
             <property name="can_focus">True</property>
             <property name="receives_default">True</property>
@@ -466,8 +498,8 @@ course</property>
             <signal name="clicked" handler="on_btn_course_assign_save_clicked" swapped="no"/>
           </object>
           <packing>
-            <property name="x">250</property>
-            <property name="y">525</property>
+            <property name="x">179</property>
+            <property name="y">526</property>
           </packing>
         </child>
       </object>
@@ -485,9 +517,18 @@ course</property>
         <property name="visible">True</property>
         <property name="can_focus">False</property>
         <child>
-          <object class="GtkScrolledWindow" id="scrolled_view">
+          <object class="GtkImage">
             <property name="width_request">600</property>
             <property name="height_request">600</property>
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <property name="pixbuf">../style/Admin Panel empty.jpg</property>
+          </object>
+        </child>
+        <child>
+          <object class="GtkScrolledWindow" id="scrolled_view">
+            <property name="width_request">600</property>
+            <property name="height_request">530</property>
             <property name="visible">True</property>
             <property name="can_focus">True</property>
             <property name="shadow_type">in</property>
@@ -498,7 +539,7 @@ course</property>
                 <child>
                   <object class="GtkGrid" id="grid_assign_table">
                     <property name="width_request">600</property>
-                    <property name="height_request">600</property>
+                    <property name="height_request">500</property>
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
                     <property name="margin_left">5</property>
@@ -506,12 +547,12 @@ course</property>
                     <property name="margin_top">5</property>
                     <property name="margin_bottom">5</property>
                     <property name="row_spacing">16</property>
-                    <property name="column_spacing">120</property>
+                    <property name="column_spacing">154</property>
                     <child>
                       <object class="GtkLabel" id="assign_label_id">
+                        <property name="name">admin_table_header</property>
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
-                        <property name="label" translatable="yes">ID</property>
                       </object>
                       <packing>
                         <property name="left_attach">0</property>
@@ -520,9 +561,9 @@ course</property>
                     </child>
                     <child>
                       <object class="GtkLabel" id="assign_label_name">
+                        <property name="name">admin_table_header</property>
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
-                        <property name="label" translatable="yes">Name</property>
                       </object>
                       <packing>
                         <property name="left_attach">1</property>
@@ -531,9 +572,9 @@ course</property>
                     </child>
                     <child>
                       <object class="GtkLabel" id="assign_label_action">
+                        <property name="name">admin_table_header</property>
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
-                        <property name="label" translatable="yes">Action</property>
                       </object>
                       <packing>
                         <property name="left_attach">2</property>
@@ -545,6 +586,63 @@ course</property>
               </object>
             </child>
           </object>
+          <packing>
+            <property name="y">57</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkLabel">
+            <property name="name">admin_table_header</property>
+            <property name="width_request">100</property>
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <property name="label" translatable="yes">Student ID</property>
+          </object>
+          <packing>
+            <property name="x">-7</property>
+            <property name="y">36</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkLabel">
+            <property name="name">admin_table_header</property>
+            <property name="width_request">100</property>
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <property name="label" translatable="yes">Name</property>
+          </object>
+          <packing>
+            <property name="x">236</property>
+            <property name="y">35</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkLabel">
+            <property name="name">admin_table_header</property>
+            <property name="width_request">100</property>
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <property name="label" translatable="yes">Action</property>
+          </object>
+          <packing>
+            <property name="x">490</property>
+            <property name="y">36</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkButton" id="backToManu">
+            <property name="label" translatable="yes">Back</property>
+            <property name="width_request">200</property>
+            <property name="height_request">49</property>
+            <property name="visible">True</property>
+            <property name="can_focus">True</property>
+            <property name="receives_default">True</property>
+            <signal name="clicked" handler="on_backToManu_clicked" swapped="no"/>
+          </object>
+          <packing>
+            <property name="x">184</property>
+            <property name="y">609</property>
+          </packing>
         </child>
       </object>
     </child>
@@ -572,7 +670,7 @@ course</property>
             </attributes>
           </object>
           <packing>
-            <property name="x">102</property>
+            <property name="x">80</property>
             <property name="y">25</property>
           </packing>
         </child>
@@ -586,7 +684,7 @@ course</property>
             <signal name="clicked" handler="on_btn_main_menu1_clicked" swapped="no"/>
           </object>
           <packing>
-            <property name="x">200</property>
+            <property name="x">187</property>
             <property name="y">255</property>
           </packing>
         </child>
@@ -615,7 +713,7 @@ course</property>
             </attributes>
           </object>
           <packing>
-            <property name="x">108</property>
+            <property name="x">96</property>
             <property name="y">25</property>
           </packing>
         </child>
@@ -723,7 +821,7 @@ course</property>
             <signal name="clicked" handler="on_btn_main_menu_clicked" swapped="no"/>
           </object>
           <packing>
-            <property name="x">200</property>
+            <property name="x">185</property>
             <property name="y">255</property>
           </packing>
         </child>
