@@ -103,12 +103,23 @@
       </object>
     </child>
   </object>
+  <object class="GtkStatusIcon">
+    <property name="visible">False</property>
+  </object>
   <object class="GtkListStore" id="liststore1"/>
   <object class="GtkListStore" id="liststore2">
     <columns>
       <!-- column-name ID -->
       <column type="gchararray"/>
       <!-- column-name Name -->
+      <column type="gchararray"/>
+    </columns>
+  </object>
+  <object class="GtkListStore" id="liststore3">
+    <columns>
+      <!-- column-name ID -->
+      <column type="gchararray"/>
+      <!-- column-name Title -->
       <column type="gchararray"/>
     </columns>
   </object>
@@ -184,63 +195,112 @@
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <child>
-                  <object class="GtkComboBox">
-                    <property name="width_request">250</property>
-                    <property name="height_request">24</property>
-                    <property name="visible">True</property>
-                    <property name="can_focus">False</property>
-                  </object>
-                  <packing>
-                    <property name="x">15</property>
-                    <property name="y">15</property>
-                  </packing>
-                </child>
-                <child>
-                  <object class="GtkLabel">
-                    <property name="name">label_status</property>
-                    <property name="width_request">100</property>
-                    <property name="visible">True</property>
-                    <property name="can_focus">False</property>
-                    <property name="label" translatable="yes">Student Status</property>
-                  </object>
-                  <packing>
-                    <property name="x">368</property>
-                    <property name="y">20</property>
-                  </packing>
-                </child>
-                <child>
                   <object class="GtkButton">
-                    <property name="label" translatable="yes">Open Channel</property>
+                    <property name="label" translatable="yes">Start the exam</property>
                     <property name="width_request">100</property>
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">True</property>
                   </object>
                   <packing>
-                    <property name="x">498</property>
-                    <property name="y">13</property>
+                    <property name="x">303</property>
+                    <property name="y">15</property>
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkScrolledWindow">
-                    <property name="width_request">262</property>
+                  <object class="GtkScrolledWindow" id="scroll_table">
+                    <property name="width_request">608</property>
                     <property name="height_request">300</property>
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="shadow_type">in</property>
                     <child>
-                      <object class="GtkViewport">
+                      <object class="GtkViewport" id="viewport">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <child>
-                          <placeholder/>
+                          <object class="GtkGrid">
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <property name="row_homogeneous">True</property>
+                            <child>
+                              <placeholder/>
+                            </child>
+                            <child>
+                              <placeholder/>
+                            </child>
+                            <child>
+                              <placeholder/>
+                            </child>
+                            <child>
+                              <placeholder/>
+                            </child>
+                            <child>
+                              <placeholder/>
+                            </child>
+                            <child>
+                              <placeholder/>
+                            </child>
+                            <child>
+                              <placeholder/>
+                            </child>
+                            <child>
+                              <placeholder/>
+                            </child>
+                            <child>
+                              <placeholder/>
+                            </child>
+                            <child>
+                              <placeholder/>
+                            </child>
+                            <child>
+                              <placeholder/>
+                            </child>
+                            <child>
+                              <placeholder/>
+                            </child>
+                            <child>
+                              <placeholder/>
+                            </child>
+                            <child>
+                              <placeholder/>
+                            </child>
+                            <child>
+                              <placeholder/>
+                            </child>
+                            <child>
+                              <placeholder/>
+                            </child>
+                          </object>
                         </child>
                       </object>
                     </child>
                   </object>
                   <packing>
-                    <property name="x">363</property>
-                    <property name="y">50</property>
+                    <property name="x">15</property>
+                    <property name="y">58</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkComboBox" id="combo_start_quiz">
+                    <property name="width_request">250</property>
+                    <property name="height_request">24</property>
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <property name="model">liststore3</property>
+                    <property name="has_entry">True</property>
+                    <property name="entry_text_column">1</property>
+                    <property name="id_column">0</property>
+                    <child internal-child="entry">
+                      <object class="GtkEntry" id="entry_combo_start_quiz">
+                        <property name="can_focus">False</property>
+                        <property name="placeholder_text" translatable="yes">Select exam</property>
+                      </object>
+                    </child>
+                  </object>
+                  <packing>
+                    <property name="x">15</property>
+                    <property name="y">15</property>
                   </packing>
                 </child>
               </object>
@@ -396,6 +456,7 @@
                     <property name="can_focus">True</property>
                     <property name="receives_default">True</property>
                     <property name="always_show_image">True</property>
+                    <signal name="clicked" handler="on_btn_save_exam_clicked" swapped="no"/>
                   </object>
                   <packing>
                     <property name="x">507</property>
@@ -793,6 +854,18 @@
           <packing>
             <property name="x">538</property>
             <property name="y">347</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkSpinner" id="login_spinner">
+            <property name="width_request">50</property>
+            <property name="height_request">40</property>
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+          </object>
+          <packing>
+            <property name="x">590</property>
+            <property name="y">370</property>
           </packing>
         </child>
       </object>

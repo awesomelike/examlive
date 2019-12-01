@@ -43,6 +43,7 @@ GtkWidget *start_btn;
 GtkWidget *pr_swap_panel;
 GtkWidget *label_prof_name;
 GtkWidget *label_prof_id;
+GtkWidget *login_spinner;
 
 //GTK professor create quiz
 GtkWidget *entry_exam_title;
@@ -62,6 +63,11 @@ GtkWidget *radio_c;
 GtkWidget *radio_d;
 GtkWidget *btn_add_question;
 GtkWidget *btn_save_exam;
+
+//GTK professor create quiz
+GtkWidget *combo_start_quiz;
+GtkWidget *entry_combo_start_quiz;
+GtkWidget *liststore3;
 
 GtkWidget *st_window_panel;
 GtkWidget *st_name;
@@ -121,6 +127,7 @@ int main(int argc, char *argv[]) {
 	login_username = GTK_WIDGET(gtk_builder_get_object(builder, "login_username"));
 	login_password = GTK_WIDGET(gtk_builder_get_object(builder, "login_password"));
 	login_label_error = GTK_WIDGET(gtk_builder_get_object(builder, "login_label_error"));
+	login_spinner = GTK_WIDGET(gtk_builder_get_object(builder, "login_spinner"));
 
 	//declare variable professor panel
 	start_btn = GTK_WIDGET(gtk_builder_get_object(builder, "start_btn"));
@@ -147,6 +154,11 @@ int main(int argc, char *argv[]) {
 	radio_d = GTK_WIDGET(gtk_builder_get_object(builder, "radio_d"));
 	btn_add_question = GTK_WIDGET(gtk_builder_get_object(builder, "btn_add_question"));
 	btn_save_exam = GTK_WIDGET(gtk_builder_get_object(builder, "btn_save_exam"));
+
+	//declare variable professor start quiz
+	combo_start_quiz = GTK_WIDGET(gtk_builder_get_object(builder, "combo_start_quiz"));
+	entry_combo_start_quiz = GTK_WIDGET(gtk_builder_get_object(builder, "entry_combo_start_quiz"));
+	liststore3 = GTK_WIDGET(gtk_builder_get_object(builder, "liststore3"));
 
 	//declare variable student panel
 	st_window_panel = GTK_WIDGET(gtk_builder_get_object(builder, "st_window_panel"));
@@ -175,15 +187,13 @@ int main(int argc, char *argv[]) {
 int row_count;
 gint x, y;
 void on_sign_in_clicked  (GtkButton *b) {
-
-	//printf("%s\n", user_id);
-	//printf("%s\n", user_password);
+	gtk_widget_show(login_spinner);
+	gtk_spinner_start(GTK_SPINNER(login_spinner));
 	char sql_select[1024];
 	
 	if(user_id[0]=='P') 
 	{
 		sprintf(sql_select, "SELECT id, full_name FROM professors WHERE id='%s' AND password='%s'", user_id, user_password);
-		//printf("%s\n", sql_select);
 		if(mysql_query(conn, sql_select)) {
     		fprintf(stderr, "%s\n", mysql_error(conn));
 			printf("%s\n", "User does not exist!");
@@ -193,6 +203,7 @@ void on_sign_in_clicked  (GtkButton *b) {
 		
 		if(mysql_num_rows(res)==0) {
 			printf("Wrong User ID, or password\n");
+			gtk_spinner_stop(GTK_SPINNER(login_spinner));
 			gtk_label_set_text(GTK_LABEL(login_label_error), (const gchar*) "Invalid user id, or password");
 			mysql_free_result(res);
 		} else { //Successful authentication
@@ -210,10 +221,21 @@ void on_sign_in_clicked  (GtkButton *b) {
 				gtk_list_store_insert_with_values(liststore2, NULL, -1, 0, row[0], 1, row[1]);	
 			}
 			
+			mysql_free_result(res);
+			sprintf(sql_select, "SELECT id, title FROM exams WHERE prof_id='%s'", user_obj.id);
+			if(mysql_query(conn, sql_select)) {
+    			fprintf(stderr, "%s\n", mysql_error(conn));
+  			}
+			res = mysql_store_result(conn);
+			while ((row = mysql_fetch_row(res)))
+			{
+				gtk_list_store_insert_with_values(liststore3, NULL, -1, 0, row[0], 1, row[1]);	
+			}
 			gtk_label_set_text(GTK_LABEL(label_prof_id), (const gchar*) user_obj.id);
 			gtk_label_set_text(GTK_LABEL(label_prof_name), (const gchar*) user_obj.full_name);
 			gtk_label_set_text(GTK_LABEL(login_label_error), (const gchar*) "");
 			gtk_widget_hide(login_window);
+			gtk_spinner_stop(GTK_SPINNER(login_spinner));
 			gtk_widget_show(pr_window_panel);	
 		}		
 	} else if (user_id[0]=='S')
@@ -244,6 +266,7 @@ void on_sign_in_clicked  (GtkButton *b) {
 			gtk_widget_show(st_window_panel);	
 		}
 	}
+	
 //pr windows current position state
 	// gtk_window_get_position(login_window, &x, &y);
 	// gtk_window_move (pr_window_panel,x,y);
@@ -324,6 +347,10 @@ void on_btn_add_question_clicked (GtkButton *b) {
 	char text[16];
 	snprintf (text, sizeof(text), "%d",num_questions);
 	gtk_label_set_text(GTK_LABEL(label_num_questions), (const gchar*) text); 
+
+}
+
+void on_btn_save_exam_clicked (GtkButton *b) {
 
 }
 
