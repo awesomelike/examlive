@@ -379,6 +379,7 @@
                     <property name="receives_default">True</property>
                     <property name="use_stock">True</property>
                     <property name="always_show_image">True</property>
+                    <signal name="clicked" handler="on_btn_add_question_clicked" swapped="no"/>
                   </object>
                   <packing>
                     <property name="x">292</property>
@@ -450,7 +451,7 @@
                     <property name="id_column">0</property>
                     <signal name="changed" handler="on_combo_course_changed" swapped="no"/>
                     <child internal-child="entry">
-                      <object class="GtkEntry" id="entry_quiz_title">
+                      <object class="GtkEntry" id="entry_combo">
                         <property name="can_focus">True</property>
                       </object>
                     </child>
@@ -487,6 +488,7 @@
                     <property name="width_request">200</property>
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
+                    <signal name="activate" handler="on_entry_exam_title_activate" swapped="no"/>
                   </object>
                   <packing>
                     <property name="x">407</property>

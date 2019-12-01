@@ -47,6 +47,7 @@ GtkWidget *label_prof_id;
 //GTK professor create quiz
 GtkWidget *entry_exam_title;
 GtkWidget *combo_course;
+GtkWidget *entry_combo;
 GtkWidget *liststore2;
 GtkWidget *label_num_questions;
 GtkWidget *entry_question;
@@ -80,6 +81,7 @@ struct User
 
 struct Exam 
 {
+	int id;
 	int course_id;
 	char prof_id[7];
 	char title[128];
@@ -130,8 +132,10 @@ int main(int argc, char *argv[]) {
 	//declare variable professor create quiz
 	entry_exam_title = GTK_WIDGET(gtk_builder_get_object(builder, "entry_exam_title"));
 	combo_course = GTK_WIDGET(gtk_builder_get_object(builder, "combo_course"));
+	entry_combo = GTK_WIDGET(gtk_builder_get_object(builder, "entry_combo"));
 	liststore2 = GTK_LIST_STORE(gtk_builder_get_object(builder, "liststore2"));
 	entry_question = GTK_WIDGET(gtk_builder_get_object(builder, "entry_question"));
+	label_num_questions = GTK_WIDGET(gtk_builder_get_object(builder, "label_num_questions"));
 	grid_create_answers = GTK_WIDGET(gtk_builder_get_object(builder, "grid_create_answers"));
 	entry_answer_a = GTK_WIDGET(gtk_builder_get_object(builder, "entry_answer_a"));
 	entry_answer_b = GTK_WIDGET(gtk_builder_get_object(builder, "entry_answer_b"));
@@ -261,19 +265,66 @@ void on_login_password_changed (GtkEntry *p ){
 }
 
 void on_combo_course_changed (GtkComboBox *c) {
-	//printf("%s\n", gtk_combo_box_get_active_id(combo_course));
-	//sprintf(exam_obj.course_id, gtk_combo_box_get_active_id(combo_course));
 	exam_obj.course_id = atoi(gtk_combo_box_get_active_id(combo_course));
-	printf("%d\n", exam_obj.course_id);
 }
 void on_entry_exam_title_activate (GtkEntry *e) {
-	printf("%s\n", gtk_entry_get_text(e));
+	sprintf(exam_obj.title, gtk_entry_get_text(e));
 	gtk_combo_box_set_button_sensitivity(GTK_COMBO_BOX(combo_course), GTK_SENSITIVITY_OFF);
-	gtk_editable_set_editable(GTK_EDITABLE(e), FALSE);
+	char sql_insert[512];
+	sprintf(sql_insert, "INSERT INTO exams (course_id, prof_id, title) VALUES(%d, '%s', '%s')", exam_obj.course_id, user_obj.id, exam_obj.title);
+	//Modify ui state
+	gtk_widget_set_sensitive(e, FALSE);
+	gtk_widget_set_sensitive(combo_course, FALSE);
 	gtk_widget_set_sensitive(btn_add_question, TRUE);
 	gtk_widget_set_sensitive(btn_save_exam, TRUE);
 	gtk_widget_show(entry_question);
 	gtk_widget_show(grid_create_answers);
+	if(mysql_query(conn, sql_insert)) {
+		fprintf(stderr, "%s\n", mysql_error(conn));
+  	}
+	exam_obj.id = mysql_insert_id(conn);
+	mysql_free_result(res);	
+}
+int num_questions = 0;
+void on_btn_add_question_clicked (GtkButton *b) {
+	char sql_insert[1024];
+	sprintf(sql_insert, "INSERT INTO questions(exam_id, question) VALUES(%d, '%s')", exam_obj.id, gtk_entry_get_text(entry_question));
+	if(mysql_query(conn, sql_insert)) {
+		fprintf(stderr, "%s\n", mysql_error(conn));
+  	}
+	int question_id = mysql_insert_id(conn);
+	
+	num_questions = num_questions + 1;
+	gtk_entry_set_text(GTK_ENTRY(entry_question), (const gchar*) "");
+	gtk_entry_set_text(GTK_ENTRY(entry_answer_a), (const gchar*) "");
+	gtk_entry_set_text(GTK_ENTRY(entry_answer_b), (const gchar*) "");
+	gtk_entry_set_text(GTK_ENTRY(entry_answer_c), (const gchar*) "");
+	gtk_entry_set_text(GTK_ENTRY(entry_answer_d), (const gchar*) "");
+	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(radio_a), TRUE);
+	char text[16];
+	snprintf (text, sizeof(text), "%d",num_questions);
+	gtk_label_set_text(GTK_LABEL(label_num_questions), (const gchar*) text); 
+	sprintf(sql_insert, "INSERT INTO choices(question_id, letter, choice_value, is_correct) VALUES(%d, 'A', '%s', %d)", 
+			question_id,  
+			gtk_entry_get_text(entry_answer_a), 
+			gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(radio_a)) ? 1 : 0);
+	if(mysql_query(conn, sql_insert)){fprintf(stderr, "%s\n", mysql_error(conn));}
+	sprintf(sql_insert, "INSERT INTO choices(question_id, letter, choice_value, is_correct) VALUES(%d, 'B', '%s', %d)", 
+			question_id,  
+			gtk_entry_get_text(entry_answer_b), 
+			gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(radio_b)) ? 1 : 0);
+	if(mysql_query(conn, sql_insert)){fprintf(stderr, "%s\n", mysql_error(conn));}
+	sprintf(sql_insert, "INSERT INTO choices(question_id, letter, choice_value, is_correct) VALUES(%d, 'C', '%s', %d)", 
+			question_id,  
+			gtk_entry_get_text(entry_answer_c), 
+			gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(radio_c)) ? 1 : 0);
+	if(mysql_query(conn, sql_insert)){fprintf(stderr, "%s\n", mysql_error(conn));}
+	sprintf(sql_insert, "INSERT INTO choices(question_id, letter, choice_value, is_correct) VALUES(%d, 'D', '%s', %d)", 
+			question_id,  
+			gtk_entry_get_text(entry_answer_d), 
+			gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(radio_d)) ? 1 : 0);
+	if(mysql_query(conn, sql_insert)){fprintf(stderr, "%s\n", mysql_error(conn));}
+
 }
 
 void on_leave_button_clicked(GtkButton *b){
