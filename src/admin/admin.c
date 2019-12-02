@@ -189,6 +189,12 @@ void on_add_user_clicked (GtkButton *b) {
 	sprintf(user_full_name, "%s", NULL);
 }
 
+//back to menu handler
+void on_backToManu_clicked (GtkButton *b){
+  gtk_widget_hide(window_assign_course_table);
+	gtk_widget_show(admin_main);
+
+}
 //This temporary array and variable is to handle duplicate rows in the list store
 char ids[64][7];
 int row_count = 0;

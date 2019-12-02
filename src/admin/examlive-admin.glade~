@@ -261,7 +261,11 @@ course</property>
           </object>
           <packing>
             <property name="x">29</property>
+<<<<<<< HEAD
             <property name="y">98</property>
+=======
+            <property name="y">96</property>
+>>>>>>> c9fc6e1e67c21cfc43d054f289b40351d6a1347e
           </packing>
         </child>
         <child>
@@ -420,17 +424,18 @@ course</property>
         <child>
           <object class="GtkGrid" id="grid_details">
             <property name="width_request">600</property>
-            <property name="height_request">100</property>
+            <property name="height_request">0</property>
             <property name="visible">True</property>
             <property name="can_focus">False</property>
+            <property name="row_spacing">3</property>
             <child>
               <object class="GtkLabel" id="id_label">
-                <property name="height_request">50</property>
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
-                <property name="label" translatable="yes">ID:</property>
+                <property name="label" translatable="yes">     ID:</property>
                 <attributes>
                   <attribute name="font-desc" value="Sans Bold 14"/>
+                  <attribute name="foreground" value="#eeeeeeeeecec"/>
                 </attributes>
               </object>
               <packing>
@@ -446,6 +451,7 @@ course</property>
                 <property name="label" translatable="yes">NAME:</property>
                 <attributes>
                   <attribute name="font-desc" value="Sans Bold 14"/>
+                  <attribute name="foreground" value="#eeeeeeeeecec"/>
                 </attributes>
               </object>
               <packing>
@@ -455,6 +461,7 @@ course</property>
             </child>
             <child>
               <object class="GtkLabel" id="id_label_value">
+                <property name="name">st_value</property>
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="label" translatable="yes">label</property>
@@ -466,6 +473,7 @@ course</property>
             </child>
             <child>
               <object class="GtkLabel" id="name_label_value">
+                <property name="name">st_value</property>
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="label" translatable="yes">label</property>
@@ -476,11 +484,16 @@ course</property>
               </packing>
             </child>
           </object>
+          <packing>
+            <property name="y">15</property>
+          </packing>
         </child>
         <child>
           <object class="GtkButton" id="btn_course_assign_save">
             <property name="label">gtk-apply</property>
-            <property name="width_request">100</property>
+            <property name="name">btn_save_course</property>
+            <property name="width_request">200</property>
+            <property name="height_request">49</property>
             <property name="visible">True</property>
             <property name="can_focus">True</property>
             <property name="receives_default">True</property>
@@ -489,8 +502,8 @@ course</property>
             <signal name="clicked" handler="on_btn_course_assign_save_clicked" swapped="no"/>
           </object>
           <packing>
-            <property name="x">250</property>
-            <property name="y">525</property>
+            <property name="x">179</property>
+            <property name="y">526</property>
           </packing>
         </child>
       </object>
@@ -509,6 +522,18 @@ course</property>
         <property name="can_focus">False</property>
         <child>
           <object class="GtkImage">
+<<<<<<< HEAD
+            <property name="width_request">600</property>
+            <property name="height_request">600</property>
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <property name="pixbuf">../style/Admin Panel empty.jpg</property>
+          </object>
+        </child>
+        <child>
+          <object class="GtkScrolledWindow" id="scrolled_view">
+=======
+>>>>>>> c9fc6e1e67c21cfc43d054f289b40351d6a1347e
             <property name="width_request">600</property>
             <property name="height_request">600</property>
             <property name="visible">True</property>
@@ -519,7 +544,7 @@ course</property>
         <child>
           <object class="GtkScrolledWindow" id="scrolled_view">
             <property name="width_request">600</property>
-            <property name="height_request">600</property>
+            <property name="height_request">530</property>
             <property name="visible">True</property>
             <property name="can_focus">True</property>
             <property name="shadow_type">in</property>
@@ -530,7 +555,7 @@ course</property>
                 <child>
                   <object class="GtkGrid" id="grid_assign_table">
                     <property name="width_request">600</property>
-                    <property name="height_request">600</property>
+                    <property name="height_request">500</property>
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
                     <property name="margin_left">5</property>
@@ -538,12 +563,12 @@ course</property>
                     <property name="margin_top">5</property>
                     <property name="margin_bottom">5</property>
                     <property name="row_spacing">16</property>
-                    <property name="column_spacing">120</property>
+                    <property name="column_spacing">154</property>
                     <child>
                       <object class="GtkLabel" id="assign_label_id">
+                        <property name="name">admin_table_header</property>
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
-                        <property name="label" translatable="yes">ID</property>
                       </object>
                       <packing>
                         <property name="left_attach">0</property>
@@ -552,9 +577,9 @@ course</property>
                     </child>
                     <child>
                       <object class="GtkLabel" id="assign_label_name">
+                        <property name="name">admin_table_header</property>
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
-                        <property name="label" translatable="yes">Name</property>
                       </object>
                       <packing>
                         <property name="left_attach">1</property>
@@ -563,9 +588,9 @@ course</property>
                     </child>
                     <child>
                       <object class="GtkLabel" id="assign_label_action">
+                        <property name="name">admin_table_header</property>
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
-                        <property name="label" translatable="yes">Action</property>
                       </object>
                       <packing>
                         <property name="left_attach">2</property>
@@ -577,6 +602,62 @@ course</property>
               </object>
             </child>
           </object>
+          <packing>
+            <property name="y">57</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkLabel">
+            <property name="name">admin_table_header</property>
+            <property name="width_request">100</property>
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <property name="label" translatable="yes">Student ID</property>
+          </object>
+          <packing>
+            <property name="x">-7</property>
+            <property name="y">36</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkLabel">
+            <property name="name">admin_table_header</property>
+            <property name="width_request">100</property>
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <property name="label" translatable="yes">Name</property>
+          </object>
+          <packing>
+            <property name="x">236</property>
+            <property name="y">35</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkLabel">
+            <property name="name">admin_table_header</property>
+            <property name="width_request">100</property>
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <property name="label" translatable="yes">Action</property>
+          </object>
+          <packing>
+            <property name="x">490</property>
+            <property name="y">36</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkButton">
+            <property name="label" translatable="yes">Back</property>
+            <property name="width_request">200</property>
+            <property name="height_request">49</property>
+            <property name="visible">True</property>
+            <property name="can_focus">True</property>
+            <property name="receives_default">True</property>
+          </object>
+          <packing>
+            <property name="x">184</property>
+            <property name="y">609</property>
+          </packing>
         </child>
       </object>
     </child>

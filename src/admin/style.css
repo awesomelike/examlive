@@ -17,19 +17,20 @@
     
 }
 #course_table_btn{
-    background-color: red;
-}
-#btn_back{
+
     background-color: transparent;
-    border: 0px solid;
-    font-size: 15px;
-    box-shadow: none;
-    border-left: 5px solid rgb(214, 211, 211);
+	color: white;
+	border-radius: 0px;
+	box-shadow: 2px;
+	border-bottom: 2px;
+	font-size:15px;
+    
 }
-#btn_back:hover{
-    background-color: rgb(9, 194, 201);
-    border: 0px solid;
-    font-size: 15px;
-    box-shadow: none;
-    border-radius: 0px;;
+#admin_table_header{
+	color: white;
+	font-size:15px;
+}
+#st_value{
+	color: white;
+	font-size: 18px;
 }
