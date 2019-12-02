@@ -299,6 +299,7 @@ void on_entry_exam_title_activate (GtkEntry *e) {
 	gtk_combo_box_set_button_sensitivity(GTK_COMBO_BOX(combo_course), GTK_SENSITIVITY_OFF);
 	char sql_insert[512];
 	sprintf(sql_insert, "INSERT INTO exams (course_id, prof_id, title) VALUES(%d, '%s', '%s')", exam_obj.course_id, user_obj.id, exam_obj.title);
+	
 	//Modify ui state
 	gtk_widget_set_sensitive(e, FALSE);
 	gtk_widget_set_sensitive(combo_course, FALSE);
@@ -310,7 +311,6 @@ void on_entry_exam_title_activate (GtkEntry *e) {
 		fprintf(stderr, "%s\n", mysql_error(conn));
   	}
 	exam_obj.id = mysql_insert_id(conn);
-	//mysql_free_result(res);	
 }
 void on_combo_start_quiz_changed (GtkComboBox *c) {
 	exam_obj.course_id = atoi(gtk_combo_box_get_active_id(c));
@@ -318,8 +318,6 @@ void on_combo_start_quiz_changed (GtkComboBox *c) {
 }
 
 void on_btn_start_exam_clicked (GtkButton *b) {
-
-	
 	system("hostname -I > ip.txt");
 	FILE * fp;
     char * ip = NULL;
@@ -396,7 +394,6 @@ void on_btn_save_exam_clicked (GtkButton *b) {
 	gtk_widget_hide(entry_question);
 	gtk_widget_hide(grid_create_answers);
 	gtk_entry_set_text(GTK_ENTRY(entry_exam_title), (const gchar*) "");
-	//gtk_combo_box_set_button_sensitivity(GTK_COMBO_BOX(combo_course), GTK_SENSITIVITY_AUTO);
 	num_questions = 0;
 	gtk_label_set_text(GTK_LABEL(label_num_questions), (const gchar*) "0"); 
 }
