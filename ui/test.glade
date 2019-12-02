@@ -195,12 +195,13 @@
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <child>
-                  <object class="GtkButton">
+                  <object class="GtkButton" id="btn_start_exam">
                     <property name="label" translatable="yes">Start the exam</property>
                     <property name="width_request">100</property>
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">True</property>
+                    <signal name="clicked" handler="on_btn_start_exam_clicked" swapped="no"/>
                   </object>
                   <packing>
                     <property name="x">303</property>
@@ -250,27 +251,6 @@
                             <child>
                               <placeholder/>
                             </child>
-                            <child>
-                              <placeholder/>
-                            </child>
-                            <child>
-                              <placeholder/>
-                            </child>
-                            <child>
-                              <placeholder/>
-                            </child>
-                            <child>
-                              <placeholder/>
-                            </child>
-                            <child>
-                              <placeholder/>
-                            </child>
-                            <child>
-                              <placeholder/>
-                            </child>
-                            <child>
-                              <placeholder/>
-                            </child>
                           </object>
                         </child>
                       </object>
@@ -291,6 +271,7 @@
                     <property name="has_entry">True</property>
                     <property name="entry_text_column">1</property>
                     <property name="id_column">0</property>
+                    <signal name="changed" handler="on_combo_start_quiz_changed" swapped="no"/>
                     <child internal-child="entry">
                       <object class="GtkEntry" id="entry_combo_start_quiz">
                         <property name="can_focus">False</property>
