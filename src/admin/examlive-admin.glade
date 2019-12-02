@@ -116,11 +116,11 @@ course</property>
         </child>
         <child>
           <object class="GtkButton" id="btn_back1">
-            <property name="label">gtk-go-back</property>
+            <property name="label">back</property>
+            <property name="name">btn_back</property>
             <property name="visible">True</property>
             <property name="can_focus">True</property>
             <property name="receives_default">True</property>
-            <property name="use_stock">True</property>
             <property name="always_show_image">True</property>
             <signal name="clicked" handler="on_btn_back1_clicked" swapped="no"/>
           </object>
@@ -240,11 +240,11 @@ course</property>
         </child>
         <child>
           <object class="GtkButton" id="btn_back2">
-            <property name="label">gtk-go-back</property>
+            <property name="label">back</property>
+            <property name="name">btn_back</property>
             <property name="visible">True</property>
             <property name="can_focus">True</property>
             <property name="receives_default">True</property>
-            <property name="use_stock">True</property>
             <property name="always_show_image">True</property>
             <signal name="clicked" handler="on_btn_back2_clicked" swapped="no"/>
           </object>
@@ -261,7 +261,9 @@ course</property>
           </object>
           <packing>
             <property name="x">29</property>
-            <property name="y">96</property>
+
+            <property name="y">98</property>
+
           </packing>
         </child>
         <child>
