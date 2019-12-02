@@ -74,6 +74,13 @@ GtkWidget *st_name;
 GtkWidget *st_id;
 GtkWidget *label_button_student;
 
+char sql_select[1024];
+
+//Utility function prototypes
+void clear_question_form();
+void get_professor_exams();
+void get_professor_courses();
+
 //Login panel variables
 char user_id[128];
 char user_password[128];
@@ -211,26 +218,10 @@ void on_sign_in_clicked  (GtkButton *b) {
 			strcpy(user_obj.id, row[0]);
 			strcpy(user_obj.full_name, row[1]);
 			mysql_free_result(res);
-			sprintf(sql_select, "SELECT courses.id, courses.title AS course_id FROM teach JOIN courses ON teach.course_id=courses.id WHERE teach.id='%s'", user_obj.id);
-			if(mysql_query(conn, sql_select)) {
-    			fprintf(stderr, "%s\n", mysql_error(conn));
-  			}
-  			res = mysql_store_result(conn);
-			while ((row = mysql_fetch_row(res)))
-			{
-				gtk_list_store_insert_with_values(liststore2, NULL, -1, 0, row[0], 1, row[1]);	
-			}
 			
-			mysql_free_result(res);
-			sprintf(sql_select, "SELECT id, title FROM exams WHERE prof_id='%s'", user_obj.id);
-			if(mysql_query(conn, sql_select)) {
-    			fprintf(stderr, "%s\n", mysql_error(conn));
-  			}
-			res = mysql_store_result(conn);
-			while ((row = mysql_fetch_row(res)))
-			{
-				gtk_list_store_insert_with_values(liststore3, NULL, -1, 0, row[0], 1, row[1]);	
-			}
+			get_professor_courses();
+			get_professor_exams();
+			
 			gtk_label_set_text(GTK_LABEL(label_prof_id), (const gchar*) user_obj.id);
 			gtk_label_set_text(GTK_LABEL(label_prof_name), (const gchar*) user_obj.full_name);
 			gtk_label_set_text(GTK_LABEL(login_label_error), (const gchar*) "");
@@ -266,7 +257,7 @@ void on_sign_in_clicked  (GtkButton *b) {
 			gtk_widget_show(st_window_panel);	
 		}
 	} else {
-			printf("else , Wrong User ID, or password\n");
+		printf("else , Wrong User ID, or password\n");
 		gtk_label_set_text(GTK_LABEL(login_label_error), (const gchar*) "Invalid user id, or password");
 	}
 	
@@ -309,8 +300,44 @@ void on_entry_exam_title_activate (GtkEntry *e) {
 		fprintf(stderr, "%s\n", mysql_error(conn));
   	}
 	exam_obj.id = mysql_insert_id(conn);
-	mysql_free_result(res);	
+	//mysql_free_result(res);	
 }
+
+void clear_question_form() {
+	gtk_entry_set_text(GTK_ENTRY(entry_question), (const gchar*) "");
+	gtk_entry_set_text(GTK_ENTRY(entry_answer_a), (const gchar*) "");
+	gtk_entry_set_text(GTK_ENTRY(entry_answer_b), (const gchar*) "");
+	gtk_entry_set_text(GTK_ENTRY(entry_answer_c), (const gchar*) "");
+	gtk_entry_set_text(GTK_ENTRY(entry_answer_d), (const gchar*) "");
+	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(radio_a), TRUE);
+}
+
+void get_professor_exams() {
+	sprintf(sql_select, "SELECT id, title FROM exams WHERE prof_id='%s'", user_obj.id);
+	if(mysql_query(conn, sql_select)) {
+		fprintf(stderr, "%s\n", mysql_error(conn));		
+	}
+	res = mysql_store_result(conn);
+	while ((row = mysql_fetch_row(res)))
+	{
+		gtk_list_store_insert_with_values(liststore3, NULL, -1, 0, row[0], 1, row[1]);	
+	}
+	mysql_free_result(res);
+}
+
+void get_professor_courses() {
+	sprintf(sql_select, "SELECT courses.id, courses.title AS course_id FROM teach JOIN courses ON teach.course_id=courses.id WHERE teach.id='%s'", user_obj.id);
+	if(mysql_query(conn, sql_select)) {
+		fprintf(stderr, "%s\n", mysql_error(conn));
+	}
+	res = mysql_store_result(conn);
+	while ((row = mysql_fetch_row(res)))
+	{
+		gtk_list_store_insert_with_values(liststore2, NULL, -1, 0, row[0], 1, row[1]);	
+	}
+	mysql_free_result(res);
+}
+
 int num_questions = 0;
 void on_btn_add_question_clicked (GtkButton *b) {
 	char sql_insert[1024];
@@ -341,12 +368,7 @@ void on_btn_add_question_clicked (GtkButton *b) {
 			gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(radio_d)) ? 1 : 0);
 	if(mysql_query(conn, sql_insert)){fprintf(stderr, "%s\n", mysql_error(conn));}
 	num_questions = num_questions + 1;
-	gtk_entry_set_text(GTK_ENTRY(entry_question), (const gchar*) "");
-	gtk_entry_set_text(GTK_ENTRY(entry_answer_a), (const gchar*) "");
-	gtk_entry_set_text(GTK_ENTRY(entry_answer_b), (const gchar*) "");
-	gtk_entry_set_text(GTK_ENTRY(entry_answer_c), (const gchar*) "");
-	gtk_entry_set_text(GTK_ENTRY(entry_answer_d), (const gchar*) "");
-	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(radio_a), TRUE);
+	clear_question_form();
 	char text[16];
 	snprintf (text, sizeof(text), "%d",num_questions);
 	gtk_label_set_text(GTK_LABEL(label_num_questions), (const gchar*) text); 
@@ -354,7 +376,18 @@ void on_btn_add_question_clicked (GtkButton *b) {
 }
 
 void on_btn_save_exam_clicked (GtkButton *b) {
-
+	gtk_list_store_clear(liststore3);
+	get_professor_exams();
+	gtk_widget_set_sensitive(entry_exam_title, TRUE);
+	gtk_widget_set_sensitive(combo_course, TRUE);
+	gtk_widget_set_sensitive(btn_add_question, FALSE);
+	gtk_widget_set_sensitive(btn_save_exam, FALSE);
+	gtk_widget_hide(entry_question);
+	gtk_widget_hide(grid_create_answers);
+	gtk_entry_set_text(GTK_ENTRY(entry_exam_title), (const gchar*) "");
+	//gtk_combo_box_set_button_sensitivity(GTK_COMBO_BOX(combo_course), GTK_SENSITIVITY_AUTO);
+	num_questions = 0;
+	gtk_label_set_text(GTK_LABEL(label_num_questions), (const gchar*) "0"); 
 }
 
 void on_leave_button_clicked(GtkButton *b){
@@ -368,7 +401,9 @@ void on_leave_button_clicked(GtkButton *b){
 	sprintf(user_obj.full_name, "");
 	gtk_entry_set_text(GTK_ENTRY(login_username), (const gchar*) "");
 	gtk_entry_set_text(GTK_ENTRY(login_password), (const gchar*) "");
-	gtk_widget_hide(pr_window_panel) ;
+	gtk_widget_hide(pr_window_panel);
+	gtk_list_store_clear(liststore2);
+	gtk_list_store_clear(liststore3);
 	gtk_widget_show(login_window);
 
 }
