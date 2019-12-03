@@ -5,7 +5,7 @@
 #include<gtk/gtk.h>
 #include<gtk/gtkx.h>
 #include<stdio.h>
-#include <fcntl.h> 
+#include<fcntl.h> 
 #include<stdlib.h>
 #include<netdb.h> 
 #include<string.h>
@@ -13,7 +13,6 @@
 #include<sys/socket.h> 
 #include<netinet/in.h> 
 #include<arpa/inet.h>
-#include<ifaddrs.h> 
 
 //CSS values
 GtkCssProvider  *provider;
@@ -313,7 +312,7 @@ void on_entry_exam_title_activate (GtkEntry *e) {
 	exam_obj.id = mysql_insert_id(conn);
 }
 void on_combo_start_quiz_changed (GtkComboBox *c) {
-	exam_obj.course_id = atoi(gtk_combo_box_get_active_id(c));
+	exam_obj.id = atoi(gtk_combo_box_get_active_id(c));
 	gtk_widget_set_sensitive(btn_start_exam, TRUE);
 }
 
@@ -335,7 +334,7 @@ void on_btn_start_exam_clicked (GtkButton *b) {
 	printf("%s\n", ip);
     fclose(fp);
 	system("rm ip.txt");
-	sprintf(sql_update, "UPDATE exams SET status=1, ip_address='%s', port_number=7777 WHERE id=%d", ip, exam_obj.course_id);
+	sprintf(sql_update, "UPDATE exams SET status=1, ip_address='%s', port_number=7777 WHERE id=%d", ip, exam_obj.id);
 	if (mysql_query(conn, sql_update))
 	{            
 		mysql_errno(conn);         
@@ -344,13 +343,13 @@ void on_btn_start_exam_clicked (GtkButton *b) {
 	mysql_free_result(res);
     if (ip)
         free(ip);
-	
 }
 
 int num_questions = 0;
 void on_btn_add_question_clicked (GtkButton *b) {
 	char sql_insert[1024];
-	sprintf(sql_insert, "INSERT INTO questions(exam_id, question) VALUES(%d, '%s')", exam_obj.id, gtk_entry_get_text(entry_question));
+	num_questions = num_questions + 1;
+	sprintf(sql_insert, "INSERT INTO questions(exam_id, question, question_number) VALUES(%d, '%s', %d)", exam_obj.id, gtk_entry_get_text(entry_question), num_questions);
 	if(mysql_query(conn, sql_insert)) {
 		fprintf(stderr, "%s\n", mysql_error(conn));
   	}
@@ -376,7 +375,6 @@ void on_btn_add_question_clicked (GtkButton *b) {
 			gtk_entry_get_text(entry_answer_d), 
 			gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(radio_d)) ? 1 : 0);
 	if(mysql_query(conn, sql_insert)){fprintf(stderr, "%s\n", mysql_error(conn));}
-	num_questions = num_questions + 1;
 	clear_question_form();
 	char text[16];
 	snprintf (text, sizeof(text), "%d",num_questions);
