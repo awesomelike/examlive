@@ -13,11 +13,8 @@
 #include<sys/socket.h> 
 #include<netinet/in.h> 
 #include<arpa/inet.h>
+#include "components.h"
 
-//CSS values
-GtkCssProvider  *provider;
-GdkScreen       *screen;
-GdkDisplay      *display;
 
 //Database credentials
 static char *host = "db4free.net";
@@ -33,52 +30,7 @@ MYSQL_RES *res;
 MYSQL_ROW row;
 
 //GTK Login Page
-GtkWidget	*login_window;
-GtkWidget	*login_fixed;
-GtkWidget	*login_image_1;
-GtkWidget	*login_button;
-GtkWidget	*login_username;
-GtkWidget	*login_password;
-GtkBuilder	*builder; 
-GtkWidget   *login_label_error;
 
-//GTK professor main panel
-GtkWidget *pr_window_panel;
-GtkWidget *start_btn;
-GtkWidget *pr_swap_panel;
-GtkWidget *label_prof_name;
-GtkWidget *label_prof_id;
-GtkWidget *login_spinner;
-
-//GTK professor create quiz
-GtkWidget *entry_exam_title;
-GtkWidget *combo_course;
-GtkWidget *entry_combo;
-GtkWidget *liststore2;
-GtkWidget *label_num_questions;
-GtkWidget *entry_question;
-GtkWidget *grid_create_answers;
-GtkWidget *entry_answer_a;
-GtkWidget *entry_answer_b;
-GtkWidget *entry_answer_c;
-GtkWidget *entry_answer_d;
-GtkWidget *radio_a;
-GtkWidget *radio_b;
-GtkWidget *radio_c;
-GtkWidget *radio_d;
-GtkWidget *btn_add_question;
-GtkWidget *btn_save_exam;
-
-//GTK professor create quiz
-GtkWidget *combo_start_quiz;
-GtkWidget *entry_combo_start_quiz;
-GtkWidget *liststore3;
-GtkWidget *btn_start_exam;
-
-GtkWidget *st_window_panel;
-GtkWidget *st_name;
-GtkWidget *st_id;
-GtkWidget *label_button_student;
 
 char sql_select[1024];
 char sql_update[1024];
@@ -87,6 +39,7 @@ char sql_update[1024];
 void clear_question_form();
 void get_professor_exams();
 void get_professor_courses();
+void get_ip_address(char *);
 
 //Login panel variables
 char user_id[128];
@@ -317,23 +270,8 @@ void on_combo_start_quiz_changed (GtkComboBox *c) {
 }
 
 void on_btn_start_exam_clicked (GtkButton *b) {
-	system("hostname -I > ip.txt");
-	FILE * fp;
-    char * ip = NULL;
-    size_t len = 0;
-    ssize_t read;
-
-    fp = fopen("ip.txt", "r");
-    if (fp == NULL)
-        exit(EXIT_FAILURE);
-
-    while ((read = getline(&ip, &len, fp)) != -1) {
-
-    }
-	printf("%d\n", strlen(ip));
-	printf("%s\n", ip);
-    fclose(fp);
-	system("rm ip.txt");
+	char ip[20];
+	get_ip_address(ip);
 	sprintf(sql_update, "UPDATE exams SET status=1, ip_address='%s', port_number=7777 WHERE id=%d", ip, exam_obj.id);
 	if (mysql_query(conn, sql_update))
 	{            
@@ -341,8 +279,7 @@ void on_btn_start_exam_clicked (GtkButton *b) {
 	}           
 	res = mysql_use_result(conn);
 	mysql_free_result(res);
-    if (ip)
-        free(ip);
+    
 }
 
 int num_questions = 0;
@@ -455,4 +392,27 @@ void get_professor_courses() {
 		gtk_list_store_insert_with_values(liststore2, NULL, -1, 0, row[0], 1, row[1]);	
 	}
 	mysql_free_result(res);
+}
+
+void get_ip_address(char *buf) {
+	system("hostname -I > ip.txt");
+	FILE * fp;
+    char * ip = NULL;
+    size_t len = 0;
+    ssize_t read;
+
+    fp = fopen("ip.txt", "r");
+    if (fp == NULL)
+        exit(EXIT_FAILURE);
+
+    while ((read = getline(&ip, &len, fp)) != -1) {
+
+    }
+	printf("%d\n", strlen(ip));
+	printf("%s\n", ip);
+    fclose(fp);
+	strcpy(buf, ip);
+	system("rm ip.txt");
+	if (ip)
+        free(ip);
 }
