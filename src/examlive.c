@@ -158,6 +158,7 @@ void on_sign_in_clicked  (GtkButton *b) {
 	} else {
 		printf("else , Wrong User ID, or password\n");
 		gtk_label_set_text(GTK_LABEL(login_label_error), (const gchar*) "Invalid user id, or password");
+		gtk_spinner_stop(login_spinner);
 	}
 	
 //pr windows current position state

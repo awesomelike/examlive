@@ -495,6 +495,7 @@
                     <child internal-child="entry">
                       <object class="GtkEntry" id="entry_combo">
                         <property name="can_focus">True</property>
+                        <property name="editable">False</property>
                       </object>
                     </child>
                   </object>
