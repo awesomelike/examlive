@@ -469,7 +469,7 @@ void join_exam(GtkButton* b, int exam_id) {
     serv_addr.sin_port = htons(PORT); 
        
     // Convert IPv4 and IPv6 addresses from text to binary form 
-    if(inet_pton(AF_INET, "127.0.0.1", &serv_addr.sin_addr)<=0)  
+    if(inet_pton(AF_INET, exam_ip, &serv_addr.sin_addr)<=0)  
     { 
         printf("\nInvalid address/ Address not supported \n"); 
         return -1; 
