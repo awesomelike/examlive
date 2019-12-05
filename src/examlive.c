@@ -1,21 +1,24 @@
-#include<mysql/mysql.h>
-#include<signal.h>
-#include<sys/types.h>
-#include<unistd.h>
-#include<gtk/gtk.h>
-#include<gtk/gtkx.h>
-#include<stdio.h>
-#include<fcntl.h> 
-#include<stdlib.h>
-#include<netdb.h> 
-#include<string.h>
-#include<ctype.h>
-#include<sys/socket.h> 
-#include<pthread.h>
-#include<netinet/in.h> 
-#include<arpa/inet.h>
+#include <mysql/mysql.h>
+#include <signal.h>
+#include <sys/types.h>
+#include <unistd.h>
+#include <gtk/gtk.h>
+#include <gtk/gtkx.h>
+#include <stdio.h>
+#include <fcntl.h> 
+#include <stdlib.h>
+#include <netdb.h> 
+#include <string.h>
+#include <ctype.h>
+#include <sys/socket.h> 
+#include <pthread.h>
+#include <netinet/in.h> 
+#include <arpa/inet.h>
 #include "components.h"
 
+#define PORT 7777
+#define START 1
+#define FINISH 0
 
 //Database credentials
 static char *host = "db4free.net";
@@ -23,24 +26,25 @@ static char *user = "examlive";
 static char *dbname = "examlive";
 static char *pass = "examlive";
 unsigned int port = 3306;
-static char* unix_socket = NULL;
+static char *unix_socket = NULL;
 unsigned int flag = 0;
 
 MYSQL *conn;
 MYSQL_RES *res;
 MYSQL_ROW row;
 
-//GTK Login Page
-
-
 char sql_select[1024];
 char sql_update[1024];
+
+//Custom signal handlers
+void join_exam(GtkButton*, int); 
 
 //Utility function prototypes
 void clear_question_form();
 void get_professor_exams();
 void get_professor_courses();
 void get_ip_address(char *);
+void split_string(char buf[], char* array[]);
 
 //Login panel variables
 char user_id[128];
@@ -91,7 +95,9 @@ int main(int argc, char *argv[]) {
 	return 0;
 }
 int row_count;
+
 gint x, y;
+
 void on_sign_in_clicked  (GtkButton *b) {
 	gtk_widget_show(login_spinner);
 	gtk_spinner_start(GTK_SPINNER(login_spinner));
@@ -131,7 +137,6 @@ void on_sign_in_clicked  (GtkButton *b) {
 	} else if (user_id[0]=='S')
 	{
 		sprintf(sql_select, "SELECT id, full_name FROM students WHERE id='%s' AND password='%s'", user_id, user_password);
-		printf("%s\n", sql_select);
 		if(mysql_query(conn, sql_select)) {
     		fprintf(stderr, "%s\n", mysql_error(conn));
 			printf("%s\n", "User does not exist!");
@@ -153,10 +158,11 @@ void on_sign_in_clicked  (GtkButton *b) {
 			gtk_label_set_text(GTK_LABEL(login_label_error), (const gchar*) "");
 			mysql_free_result(res);
 			gtk_widget_hide(login_window);
-			gtk_widget_show(st_window_panel);	
+			get_online_exams();
+			gtk_widget_show_all(st_window_panel);	
 		}
 	} else {
-		printf("else , Wrong User ID, or password\n");
+		printf("Wrong User ID, or password\n");
 		gtk_label_set_text(GTK_LABEL(login_label_error), (const gchar*) "Invalid user id, or password");
 		gtk_spinner_stop(login_spinner);
 	}
@@ -168,10 +174,6 @@ void on_sign_in_clicked  (GtkButton *b) {
 	// 	printf("current position SIGN IN PAGE is:\nx: %i\ny:%i\n", x, y);
  //window switches
 }
-void on_pr_start_quiz_clicked (GtkButton *c){
-	
-}
-
 
 void on_login_username_changed(GtkEntry *e){
 	sprintf(user_id, "%s", gtk_entry_get_text(e));
@@ -208,16 +210,45 @@ void on_combo_start_quiz_changed (GtkComboBox *c) {
 }
 
 void on_btn_start_exam_clicked (GtkButton *b) {
-	char ip[20];
-	get_ip_address(ip);
-	sprintf(sql_update, "UPDATE exams SET status=1, ip_address='%s', port_number=7777 WHERE id=%d", ip, exam_obj.id);
-	if (mysql_query(conn, sql_update))
-	{            
-		mysql_errno(conn);         
-	}           
-	res = mysql_use_result(conn);
-	mysql_free_result(res);
-    
+    update_exam_status(START);
+	
+	//TODO start_socket()
+	int server_sock;
+	int client_sock;
+	struct sockaddr_in serv_address;
+	struct sockaddr_in client_address;
+
+	int client_len;
+	
+	pthread_t threadID;
+
+	if((server_sock = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
+		perror("Socket error"); 
+		exit(EXIT_FAILURE);
+	}
+
+	serv_address.sin_family = AF_INET;
+	serv_address.sin_addr.s_addr = INADDR_ANY;
+	serv_address.sin_port = htons (PORT);
+
+	if(bind(server_sock, (struct sockaddr*) &serv_address, sizeof(serv_address)) < 0) {
+		perror("Socket error"); 
+		exit(EXIT_FAILURE);
+	}
+
+	if(listen(server_sock, 5) < 0) {
+		perror("Socket error"); 
+		exit(EXIT_FAILURE);
+	}
+	for(;;) {
+		printf("%s\n", "Waiting for students!");
+		client_len = sizeof(client_address);
+		if((client_sock = accept(server_sock, (struct sockaddr*) &client_address, &client_len)) < 0) {
+			exit(EXIT_FAILURE);
+		}
+		/* now client is connected to the server */
+		printf("Client IP=%s\n", inet_ntoa(client_address.sin_addr));
+	}
 }
 
 void *showSpinner(void *args) {
@@ -316,6 +347,83 @@ void clear_question_form() {
 	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(radio_a), TRUE);
 }
 
+void get_online_exams() {
+	sprintf(sql_select, 
+			"SELECT p.full_name, c.title AS course_title, e.title AS exam_title, e.id AS exam_id FROM exams e JOIN professors p ON e.prof_id=p.id JOIN courses c ON e.course_id=c.id WHERE e.course_id IN (SELECT course_id FROM take WHERE id='%s') AND e.status=1", user_obj.id);
+	if(mysql_query(conn, sql_select)) {
+    	fprintf(stderr, "%s\n", mysql_error(conn)); 
+  	}
+  	res = mysql_store_result(conn);
+	int y=1;
+	while ((row = mysql_fetch_row(res)))
+	{
+		int x=0;
+		gtk_grid_attach(GTK_GRID(grid_exams), gtk_label_new((const gchar*) row[x]), x, y, 1, 1);
+		x = x + 1;
+		gtk_grid_attach(GTK_GRID(grid_exams), gtk_label_new((const gchar*) row[x]), x, y, 1, 1);
+		x = x + 1;
+		gtk_grid_attach(GTK_GRID(grid_exams), gtk_label_new((const gchar*) row[x]), x, y, 1, 1);
+		x = x + 1;
+		gtk_grid_attach(GTK_GRID(grid_exams), gtk_label_new((const gchar*) row[x]), x, y, 1, 1);
+		x = x + 1;
+		gtk_grid_attach(GTK_GRID(grid_exams), gtk_image_new_from_icon_name((const gchar*) "software-update-available", 1), x, y, 1, 1);
+		x = x + 1;
+		join_button[y] = gtk_button_new_with_label((const gchar*) "Join");
+		gtk_grid_attach(GTK_GRID(grid_exams), join_button[y], x, y, 1, 1);
+		int id = atoi(row[3]);
+		g_signal_connect(join_button[y], "clicked", G_CALLBACK(join_exam), id);
+		y = y + 1;
+	} 
+	mysql_free_result(res);
+}
+
+void join_exam(GtkButton* b, int exam_id) {
+	printf("Joining exam: %d \n", exam_id);
+	sprintf(sql_select, "SELECT ip_address, port_number FROM exams WHERE id=%d ", exam_id);
+	
+	if(mysql_query(conn, sql_select)) {
+    	fprintf(stderr, "%s\n", mysql_error(conn)); 
+  	}
+	
+	res = mysql_store_result(conn);
+	
+	char exam_ip[32];
+	int port;
+	while ((row = mysql_fetch_row(res)))
+	{
+		sprintf(exam_ip, row[0]);
+		port  = atoi(row[1]);
+	}
+	exam_ip[strcspn(exam_ip, "\n")] = 0;
+	
+	printf("%s\n", exam_ip);
+	printf("%d\n", port);
+	int sock = 0;
+	struct sockaddr_in serv_addr;
+	
+	if ((sock = socket(AF_INET, SOCK_STREAM, 0) < 0))
+	{
+		printf("%s\n", "Socket error");
+		exit(EXIT_FAILURE);
+	}
+	serv_addr.sin_family = AF_INET;
+	serv_addr.sin_port = port;
+
+	if(inet_pton(AF_INET, "127.0.0.1", &serv_addr.sin_addr)<=0)  
+    { 
+        printf("\nInvalid address/ Address not supported \n"); 
+        return -1; 
+    } 
+
+	if(connect(sock, (struct sockaddr *)&serv_addr, sizeof(serv_addr) < 0)) {
+		printf("%s\n", "Connect error");
+		exit(EXIT_FAILURE);
+	}
+	
+	
+
+}
+
 void get_professor_exams() {
 	sprintf(sql_select, "SELECT id, title FROM exams WHERE prof_id='%s'", user_obj.id);
 	if(mysql_query(conn, sql_select)) {
@@ -342,6 +450,32 @@ void get_professor_courses() {
 	mysql_free_result(res);
 }
 
+void update_exam_status(int status) {
+	if(status == START) {
+		char ip[20];
+		get_ip_address(ip);
+		ip[strcspn(ip, "\n")] = 0;
+
+		//Update exam status and store server ip and port in the database
+		sprintf(sql_update, "UPDATE exams SET status=1, ip_address='%s', port_number=%d WHERE id=%d", ip, PORT, exam_obj.id);
+		if (mysql_query(conn, sql_update))
+		{            
+			mysql_errno(conn);         
+		}           
+		res = mysql_use_result(conn);
+		mysql_free_result(res);
+	} else if (status == FINISH) {
+		sprintf(sql_update, "UPDATE exams SET status=0 WHERE id=%d", exam_obj.id);
+		if (mysql_query(conn, sql_update))
+		{            
+			mysql_errno(conn);         
+		}           
+		res = mysql_use_result(conn);
+		mysql_free_result(res);
+	}
+	
+}
+
 void get_ip_address(char *buf) {
 	system("hostname -I > ip.txt");
 	FILE * fp;
@@ -363,4 +497,15 @@ void get_ip_address(char *buf) {
 	system("rm ip.txt");
 	if (ip)
         free(ip);
+}
+
+void split_string(char buf[], char* array[]){
+    int i = 0;
+    char *p = strtok (buf, "|");
+
+    while (p != NULL)
+    {
+        array[i++] = p;
+        p = strtok (NULL, "|");
+    }
 }

@@ -38,17 +38,19 @@ GtkWidget *btn_add_question;
 GtkWidget *btn_save_exam;
 GtkWidget *spinner_add_question;
 
-//GTK professor create quiz
+//GTK professor start quiz
 GtkWidget *combo_start_quiz;
 GtkWidget *entry_combo_start_quiz;
 GtkWidget *liststore3;
 GtkWidget *btn_start_exam;
 
+//GTK student main menu
 GtkWidget *st_window_panel;
 GtkWidget *st_name;
 GtkWidget *st_id;
 GtkWidget *label_button_student;
-
+GtkWidget *grid_exams;
+GtkWidget *join_button[10];
 
 //CSS values
 GtkCssProvider  *provider;
@@ -113,6 +115,8 @@ void initialize_components() {
 	st_id = GTK_WIDGET(gtk_builder_get_object(builder, "st_id"));
 	st_name = GTK_WIDGET(gtk_builder_get_object(builder, "st_name"));
 	label_button_student = GTK_WIDGET(gtk_builder_get_object(builder, "leave_button_student"));
+	grid_exams = GTK_WIDGET(gtk_builder_get_object(builder, "grid_exams"));
+	
 
 	//These lines used to connect CSS
     provider = gtk_css_provider_new();

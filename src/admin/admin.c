@@ -373,7 +373,7 @@ void get_students_table() {
     	fprintf(stderr, "%s\n", mysql_error(conn)); 
   	}
   	res = mysql_store_result(conn);
-	int top = 1; 
+	int top = 0; 
 	while ((row = mysql_fetch_row(res)))
 	{
 		int left = 0;
