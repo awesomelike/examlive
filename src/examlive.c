@@ -213,42 +213,101 @@ void on_btn_start_exam_clicked (GtkButton *b) {
     update_exam_status(START);
 	
 	//TODO start_socket()
-	int server_sock;
-	int client_sock;
-	struct sockaddr_in serv_address;
-	struct sockaddr_in client_address;
 
-	int client_len;
+	int server_fd, new_socket, valread; 
+    struct sockaddr_in address; 
+    int opt = 1; 
+    int addrlen = sizeof(address); 
+    char buffer[1024] = {0}; 
+    char *hello = "Hello from server"; 
+       
+    // Creating socket file descriptor 
+    if ((server_fd = socket(AF_INET, SOCK_STREAM, 0)) == 0) 
+    { 
+        perror("socket failed"); 
+        exit(EXIT_FAILURE); 
+    } 
+       
+    // Forcefully attaching socket to the port 8080 
+    if (setsockopt(server_fd, SOL_SOCKET, SO_REUSEADDR | SO_REUSEPORT, 
+                                                  &opt, sizeof(opt))) 
+    { 
+        perror("setsockopt"); 
+        exit(EXIT_FAILURE); 
+    } 
+    address.sin_family = AF_INET; 
+    address.sin_addr.s_addr = INADDR_ANY; 
+    address.sin_port = htons( PORT ); 
+       
+    // Forcefully attaching socket to the port 8080 
+    if (bind(server_fd, (struct sockaddr *)&address,  
+                                 sizeof(address))<0) 
+    { 
+        perror("bind failed"); 
+        exit(EXIT_FAILURE); 
+    } 
+    if (listen(server_fd, 3) < 0) 
+    { 
+        perror("listen"); 
+        exit(EXIT_FAILURE); 
+    }
+	while (TRUE)
+	{
+		if ((new_socket = accept(server_fd, (struct sockaddr *)&address,  
+						(socklen_t*)&addrlen))<0) 
+		{ 
+			perror("accept"); 
+			exit(EXIT_FAILURE); 
+		} 
+		valread = read( new_socket , buffer, 1024); 
+		printf("%s\n",buffer ); 
+		send(new_socket , hello , strlen(hello) , 0 ); 
+		printf("Hello message sent\n"); 
+	}
+	 
+    
+	// int server_sock;
+	// int client_sock;
+	// struct sockaddr_in serv_address;
+	// struct sockaddr_in client_address;
+
+	// int client_len;
 	
-	pthread_t threadID;
+	// //pthread_t threadID;
 
-	if((server_sock = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
-		perror("Socket error"); 
-		exit(EXIT_FAILURE);
-	}
+	// if((server_sock = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
+	// 	perror("Socket error"); 
+	// 	exit(EXIT_FAILURE);
+	// }
 
-	serv_address.sin_family = AF_INET;
-	serv_address.sin_addr.s_addr = INADDR_ANY;
-	serv_address.sin_port = htons (PORT);
+	// serv_address.sin_family = AF_INET;
+	// serv_address.sin_addr.s_addr = INADDR_ANY;
+	// serv_address.sin_port = htons (PORT);
 
-	if(bind(server_sock, (struct sockaddr*) &serv_address, sizeof(serv_address)) < 0) {
-		perror("Socket error"); 
-		exit(EXIT_FAILURE);
-	}
+	// if(bind(server_sock, (struct sockaddr*) &serv_address, sizeof(serv_address)) < 0) {
+	// 	perror("Socket error"); 
+	// 	exit(EXIT_FAILURE);
+	// }
 
-	if(listen(server_sock, 5) < 0) {
-		perror("Socket error"); 
-		exit(EXIT_FAILURE);
-	}
-	for(;;) {
-		printf("%s\n", "Waiting for students!");
-		client_len = sizeof(client_address);
-		if((client_sock = accept(server_sock, (struct sockaddr*) &client_address, &client_len)) < 0) {
-			exit(EXIT_FAILURE);
-		}
-		/* now client is connected to the server */
-		printf("Client IP=%s\n", inet_ntoa(client_address.sin_addr));
-	}
+	// if(listen(server_sock, 5) < 0) {
+	// 	perror("Socket error"); 
+	// 	exit(EXIT_FAILURE);
+	// }
+	// for(;;) {
+	// 	printf("%s\n", "Waiting for students!");
+	// 	client_len = sizeof(client_address);
+	// 	// if((client_sock = accept(server_sock, (struct sockaddr*) &client_address, (socklen_t*)&client_len)) < 0) {
+	// 	// 	exit(EXIT_FAILURE);
+	// 	// }
+	// 	if ((client_sock = accept(server_sock, (struct sockaddr *)&serv_address,  
+    //                    (socklen_t*)&client_len)<0)) 
+    // 	{ 
+    //     	perror("accept"); 
+    //     	exit(EXIT_FAILURE); 
+    // 	} 
+	// 	/* now client is connected to the server */
+	// 	printf("Client IP=%s\n", inet_ntoa(client_address.sin_addr));
+	// }
 }
 
 void *showSpinner(void *args) {
@@ -386,7 +445,6 @@ void join_exam(GtkButton* b, int exam_id) {
   	}
 	
 	res = mysql_store_result(conn);
-	
 	char exam_ip[32];
 	int port;
 	while ((row = mysql_fetch_row(res)))
@@ -394,31 +452,63 @@ void join_exam(GtkButton* b, int exam_id) {
 		sprintf(exam_ip, row[0]);
 		port  = atoi(row[1]);
 	}
-	exam_ip[strcspn(exam_ip, "\n")] = 0;
-	
-	printf("%s\n", exam_ip);
-	printf("%d\n", port);
-	int sock = 0;
-	struct sockaddr_in serv_addr;
-	
-	if ((sock = socket(AF_INET, SOCK_STREAM, 0) < 0))
-	{
-		printf("%s\n", "Socket error");
-		exit(EXIT_FAILURE);
-	}
-	serv_addr.sin_family = AF_INET;
-	serv_addr.sin_port = port;
-
-	if(inet_pton(AF_INET, "127.0.0.1", &serv_addr.sin_addr)<=0)  
+	//exam_ip[strcspn(exam_ip, "\n")] = 0;
+	exam_ip[strlen(exam_ip)-1] = 0;
+	/////////
+	int sock = 0, valread; 
+    struct sockaddr_in serv_addr; 
+    char *hello = "Hello from client"; 
+    char buffer[1024] = {0}; 
+    if ((sock = socket(AF_INET, SOCK_STREAM, 0)) < 0) 
+    { 
+        printf("\n Socket creation error \n"); 
+        return -1; 
+    } 
+   
+    serv_addr.sin_family = AF_INET; 
+    serv_addr.sin_port = htons(PORT); 
+       
+    // Convert IPv4 and IPv6 addresses from text to binary form 
+    if(inet_pton(AF_INET, "127.0.0.1", &serv_addr.sin_addr)<=0)  
     { 
         printf("\nInvalid address/ Address not supported \n"); 
         return -1; 
     } 
+   
+    if (connect(sock, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) < 0) 
+    { 
+        printf("\nConnection Failed \n"); 
+        return -1; 
+    } 
+    send(sock , hello , strlen(hello) , 0 ); 
+    printf("Hello message sent\n"); 
+    valread = read( sock , buffer, 1024); 
+    printf("%s\n",buffer ); 
+	
+	
+	// printf("%s\n", exam_ip);
+	// printf("%d\n", port);
+	// int sock = 0;
+	// struct sockaddr_in serv_addr;
+	
+	// if ((sock = socket(AF_INET, SOCK_STREAM, 0) < 0))
+	// {
+	// 	printf("%s\n", "Socket error");
+	// 	exit(EXIT_FAILURE);
+	// }
+	// serv_addr.sin_family = AF_INET;
+	// serv_addr.sin_port = port;
 
-	if(connect(sock, (struct sockaddr *)&serv_addr, sizeof(serv_addr) < 0)) {
-		printf("%s\n", "Connect error");
-		exit(EXIT_FAILURE);
-	}
+	// if(inet_pton(AF_INET, "127.0.0.1", &serv_addr.sin_addr)<=0)  
+    // { 
+    //     printf("\nInvalid address/ Address not supported \n"); 
+    //     return -1; 
+    // } 
+
+	// if(connect(sock, (struct sockaddr *)&serv_addr, sizeof(serv_addr) < 0)) {
+	// 	printf("%s\n", "Connect error");
+	// 	exit(EXIT_FAILURE);
+	// }
 	
 	
 
@@ -455,7 +545,8 @@ void update_exam_status(int status) {
 		char ip[20];
 		get_ip_address(ip);
 		ip[strcspn(ip, "\n")] = 0;
-
+		if( ip[strlen(ip)-1] == '\n' )
+    		ip[strlen(ip)-1] = 0;		
 		//Update exam status and store server ip and port in the database
 		sprintf(sql_update, "UPDATE exams SET status=1, ip_address='%s', port_number=%d WHERE id=%d", ip, PORT, exam_obj.id);
 		if (mysql_query(conn, sql_update))
