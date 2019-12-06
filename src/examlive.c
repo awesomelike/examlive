@@ -15,10 +15,14 @@
 #include <netinet/in.h> 
 #include <arpa/inet.h>
 #include "components.h"
+#include "server.h"
 
 #define PORT 7777
 #define START 1
 #define FINISH 0
+
+#define MSG_LEN 1024
+
 
 //Database credentials
 static char *host = "db4free.net";
@@ -49,6 +53,9 @@ void split_string(char buf[], char* array[]);
 //Login panel variables
 char user_id[128];
 char user_password[128];
+
+//Variables to keep track of joined students
+StudentList *head, *cur; 
 
 struct User
 {
@@ -209,15 +216,39 @@ void on_combo_start_quiz_changed (GtkComboBox *c) {
 	gtk_widget_set_sensitive(btn_start_exam, TRUE);
 }
 
+void request_handler_thread(void *s) {
+	char id[7] = {};
+	char name[128] = {};
+	char recv_buffer[MSG_LEN];
+	StudentList *student = (StudentList*) s;
+	if(recv(student->data, recv_buffer, MSG_LEN, 0) <=0) {
+		printf("%s\n","Wrong request");
+	} else if (recv_buffer[0]=='$') {
+		printf("%s\n","SERVER: Received a join request");
+		
+		char *temp_arr[4];
+		split_string(recv_buffer, temp_arr);
+		printf("%s\n", temp_arr[1]);
+		strncpy(student->id, temp_arr[1], (size_t)7);
+		printf("%s\n", temp_arr[2]);
+		printf("%s\n", temp_arr[3]);
+		strncpy(student->name, temp_arr[3], (size_t)atoi(temp_arr[2]));
+	}
+}
+
 void on_btn_start_exam_clicked (GtkButton *b) {
     update_exam_status(START);
 	
+	//TODO populate exam table
+	
+
 	//TODO start_socket()
 
-	int server_fd, new_socket, valread; 
-    struct sockaddr_in address; 
+	int server_fd, client_socket, valread; 
+    struct sockaddr_in serv_address, client_address; 
     int opt = 1; 
-    int addrlen = sizeof(address); 
+    int server_addrlen = sizeof(serv_address);
+	int client_addrlen = sizeof(client_address); 
     char buffer[1024] = {0}; 
     char *hello = "Hello from server"; 
        
@@ -235,13 +266,13 @@ void on_btn_start_exam_clicked (GtkButton *b) {
         perror("setsockopt"); 
         exit(EXIT_FAILURE); 
     } 
-    address.sin_family = AF_INET; 
-    address.sin_addr.s_addr = INADDR_ANY; 
-    address.sin_port = htons( PORT ); 
-       
+    serv_address.sin_family = AF_INET; 
+    serv_address.sin_addr.s_addr = INADDR_ANY; 
+    serv_address.sin_port = htons( PORT ); 
+    
     // Forcefully attaching socket to the port 8080 
-    if (bind(server_fd, (struct sockaddr *)&address,  
-                                 sizeof(address))<0) 
+    if (bind(server_fd, (struct sockaddr *)&serv_address,  
+                                 sizeof(serv_address))<0) 
     { 
         perror("bind failed"); 
         exit(EXIT_FAILURE); 
@@ -251,18 +282,37 @@ void on_btn_start_exam_clicked (GtkButton *b) {
         perror("listen"); 
         exit(EXIT_FAILURE); 
     }
+	char serv_ip[32];
+	get_ip_address(serv_ip);
+	head = newNode(server_fd, serv_ip);
+	cur = head;
 	while (TRUE)
 	{
-		if ((new_socket = accept(server_fd, (struct sockaddr *)&address,  
-						(socklen_t*)&addrlen))<0) 
-		{ 
+		if ((client_socket = accept(server_fd, (struct sockaddr *)&serv_address, (socklen_t*)&server_addrlen))<0) { 
 			perror("accept"); 
 			exit(EXIT_FAILURE); 
-		} 
-		valread = read( new_socket , buffer, 1024); 
-		printf("%s\n",buffer ); 
-		send(new_socket , hello , strlen(hello) , 0 ); 
-		printf("Hello message sent\n"); 
+		}
+		getpeername(client_socket, (struct sockaddr*) &client_address, (struct socklen_t*)&client_address);
+		printf("Client ip: %s\n", inet_ntoa(client_address.sin_addr)); 
+		
+		// read(client_socket, buffer, 1024);
+		// char *arr[2];
+		// split_string(buffer, arr);
+		
+		StudentList *s = newNode(client_socket, inet_ntoa(client_address.sin_addr));
+		s->prev = cur;
+		cur->next = s;
+		cur = s;
+
+		pthread_t threadID;
+		if(pthread_create(&threadID, NULL, (void*)request_handler_thread, (void*)s) != 0) {
+			perror("Thread creation error!\n");
+			exit(EXIT_FAILURE);
+		}
+		// valread = read(client_socket, buffer, 1024); 
+		// printf("%s\n", buffer); 
+		//send(client_socket , hello , strlen(hello) , 0 ); 
+		//printf("Hello message sent\n"); 
 	}
 	 
     
@@ -455,11 +505,11 @@ void join_exam(GtkButton* b, int exam_id) {
 	//exam_ip[strcspn(exam_ip, "\n")] = 0;
 	exam_ip[strlen(exam_ip)-1] = 0;
 	/////////
-	int sock = 0, valread; 
+	int server_socket = 0, valread; 
     struct sockaddr_in serv_addr; 
     char *hello = "Hello from client"; 
     char buffer[1024] = {0}; 
-    if ((sock = socket(AF_INET, SOCK_STREAM, 0)) < 0) 
+    if ((server_socket = socket(AF_INET, SOCK_STREAM, 0)) < 0) 
     { 
         printf("\n Socket creation error \n"); 
         return -1; 
@@ -475,14 +525,24 @@ void join_exam(GtkButton* b, int exam_id) {
         return -1; 
     } 
    
-    if (connect(sock, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) < 0) 
+    if (connect(server_socket, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) < 0) 
     { 
         printf("\nConnection Failed \n"); 
         return -1; 
     } 
-    send(sock , hello , strlen(hello) , 0 ); 
-    printf("Hello message sent\n"); 
-    valread = read( sock , buffer, 1024); 
+    //send(server_socket, hello , strlen(hello) , 0 ); 
+	char msg[128];
+	sprintf(msg, "$|%s", user_obj.id);
+	strcat(msg, "|");
+	char len_str[2];
+	sprintf(len_str, "%d", strlen(user_obj.full_name));
+	strcat(msg, len_str);
+	strcat(msg, "|");
+	strncat(msg, user_obj.full_name, strlen(user_obj.full_name));
+	printf("%s\n", msg);
+	send(server_socket, msg, strlen(msg), 0);
+    //printf("Hello message sent\n"); 
+    valread = read(server_socket, buffer, 1024); 
     printf("%s\n",buffer ); 
 	
 	
@@ -581,8 +641,6 @@ void get_ip_address(char *buf) {
     while ((read = getline(&ip, &len, fp)) != -1) {
 
     }
-	printf("%d\n", strlen(ip));
-	printf("%s\n", ip);
     fclose(fp);
 	strcpy(buf, ip);
 	system("rm ip.txt");

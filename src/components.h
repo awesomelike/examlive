@@ -43,6 +43,8 @@ GtkWidget *combo_start_quiz;
 GtkWidget *entry_combo_start_quiz;
 GtkWidget *liststore3;
 GtkWidget *btn_start_exam;
+GtkWidget *grid_student_results;
+
 
 //GTK student main menu
 GtkWidget *st_window_panel;
@@ -109,6 +111,7 @@ void initialize_components() {
 	entry_combo_start_quiz = GTK_WIDGET(gtk_builder_get_object(builder, "entry_combo_start_quiz"));
 	liststore3 = GTK_LIST_STORE(gtk_builder_get_object(builder, "liststore3"));
 	btn_start_exam = GTK_WIDGET(gtk_builder_get_object(builder, "btn_start_exam"));
+	grid_student_results = GTK_WIDGET(gtk_builder_get_object(builder, "grid_student_results"));
 
 	//declare variable student panel
 	st_window_panel = GTK_WIDGET(gtk_builder_get_object(builder, "st_window_panel"));
