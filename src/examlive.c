@@ -29,10 +29,12 @@ unsigned int port = 3306;
 static char *unix_socket = NULL;
 unsigned int flag = 0;
 
+//mysql connection
 MYSQL *conn;
 MYSQL_RES *res;
 MYSQL_ROW row;
 
+//sql request array
 char sql_select[1024];
 char sql_update[1024];
 
@@ -118,7 +120,8 @@ void on_sign_in_clicked  (GtkButton *b) {
 			gtk_spinner_stop(GTK_SPINNER(login_spinner));
 			gtk_label_set_text(GTK_LABEL(login_label_error), (const gchar*) "Invalid user id, or password");
 			mysql_free_result(res);
-		} else { //Successful authentication
+		} else { 
+			//Successful authentication
 			row = mysql_fetch_row(res);
 			strcpy(user_obj.id, row[0]);
 			strcpy(user_obj.full_name, row[1]);
