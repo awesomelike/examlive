@@ -48,6 +48,7 @@ void clear_question_form();
 void get_professor_exams();
 void get_professor_courses();
 void get_ip_address(char *);
+void get_next_question();
 void split_string(char buf[], char* array[]);
 
 //Login panel variables
@@ -55,7 +56,16 @@ char user_id[128];
 char user_password[128];
 
 //Variables to keep track of joined students
-StudentList *head, *cur; 
+StudentList *head, *cur;
+
+/*Global socket variables */
+//Server side variables
+int s_server_fd, s_client_socket, valread; 
+struct sockaddr_in s_serv_address, s_client_address;
+//Client side variables
+int c_server_socket = 0, valread; 
+struct sockaddr_in c_serv_addr; 
+
 
 struct User
 {
@@ -273,57 +283,55 @@ void table_thread() {
 }
 
 void server_socket_thread() {
-int server_fd, client_socket, valread; 
-    struct sockaddr_in serv_address, client_address; 
     int opt = 1; 
-    int server_addrlen = sizeof(serv_address);
-	int client_addrlen = sizeof(client_address); 
+    int s_server_addrlen = sizeof(s_serv_address);
+	int s_client_addrlen = sizeof(s_client_address); 
     char buffer[1024] = {0}; 
     char *hello = "Hello from server"; 
        
     // // Creating socket file descriptor 
-    if ((server_fd = socket(AF_INET, SOCK_STREAM, 0)) == 0) 
+    if ((s_server_fd = socket(AF_INET, SOCK_STREAM, 0)) == 0) 
     { 
         perror("socket failed"); 
         exit(EXIT_FAILURE); 
     } 
-    if (setsockopt(server_fd, SOL_SOCKET, SO_REUSEADDR | SO_REUSEPORT, 
+    if (setsockopt(s_server_fd, SOL_SOCKET, SO_REUSEADDR | SO_REUSEPORT, 
                                                   &opt, sizeof(opt))) 
     { 
         perror("setsockopt"); 
         exit(EXIT_FAILURE); 
     } 
-    serv_address.sin_family = AF_INET; 
-    serv_address.sin_addr.s_addr = INADDR_ANY; 
-    serv_address.sin_port = htons( PORT ); 
+    s_serv_address.sin_family = AF_INET; 
+    s_serv_address.sin_addr.s_addr = INADDR_ANY; 
+    s_serv_address.sin_port = htons( PORT ); 
     
-    if (bind(server_fd, (struct sockaddr *)&serv_address,  
-                                 sizeof(serv_address))<0) 
+    if (bind(s_server_fd, (struct sockaddr *)&s_serv_address,  
+                                 sizeof(s_serv_address))<0) 
     { 
         perror("bind failed"); 
         exit(EXIT_FAILURE); 
     } 
-    if (listen(server_fd, 5) < 0) 
+    if (listen(s_server_fd, 5) < 0) 
     { 
         perror("listen"); 
         exit(EXIT_FAILURE); 
     }
 	char serv_ip[32];
 	get_ip_address(serv_ip);
-	head = newNode(server_fd, serv_ip);
+	head = newNode(s_server_fd, serv_ip);
 	cur = head;
 	
 	while (1)
 	{
-		if ((client_socket = accept(server_fd, (struct sockaddr *)&serv_address, (socklen_t*)&server_addrlen))<0) { 
+		if ((s_client_socket = accept(s_server_fd, (struct sockaddr *)&s_serv_address, (socklen_t*)&s_server_addrlen))<0) { 
 			perror("accept"); 
 			exit(EXIT_FAILURE); 
 		}
 
-		getpeername(client_socket, (struct sockaddr*) &client_address, (struct socklen_t*)&client_address);
-		printf("Client ip: %s\n", inet_ntoa(client_address.sin_addr)); 
+		getpeername(s_client_socket, (struct sockaddr*) &s_client_address, (struct socklen_t*)&s_client_address);
+		printf("Client ip: %s\n", inet_ntoa(s_client_address.sin_addr)); 
 		
-		StudentList *s = newNode(client_socket, inet_ntoa(client_address.sin_addr));
+		StudentList *s = newNode(s_client_socket, inet_ntoa(s_client_address.sin_addr));
 		s->prev = cur;
 		cur->next = s;
 		cur = s;
@@ -481,10 +489,42 @@ void get_online_exams() {
 	mysql_free_result(res);
 }
 
+void get_next_question() {
+	static int current_question = 1;
+	char temp[3];
+	sprintf(temp, "%d", current_question);
+	gtk_label_set_text(GTK_LABEL(label_exam_question_number), (const gchar*)temp);
+	
+	sprintf(sql_select, "SELECT id as question_id, question, choices.letter, choices.choice_value FROM questions JOIN choices ON questions.id=choices.question_id WHERE exam_id=%d AND question_number=%d", exam_obj.id, current_question);
+	if(mysql_query(conn, sql_select)) {
+    	fprintf(stderr, "%s\n", mysql_error(conn)); 
+  	}
+	
+	res = mysql_store_result(conn);
+	
+	while ((row = mysql_fetch_row(res)))
+	{
+		gtk_label_set_text(GTK_LABEL(label_exam_question), (const gchar*)row[1]);
+		if(strcmp(row[2], "A")==0) {
+			gtk_button_set_label(GTK_BUTTON(exam_answer_a), (const gchar*)row[3]);
+		}
+		if(strcmp(row[2], "B")==0) {
+			gtk_button_set_label(GTK_BUTTON(exam_answer_b), (const gchar*)row[3]);
+		}
+		if(strcmp(row[2], "C")==0) {
+			gtk_button_set_label(GTK_BUTTON(exam_answer_c), (const gchar*)row[3]);
+		}
+		if(strcmp(row[2], "D")==0) {
+			gtk_button_set_label(GTK_BUTTON(exam_answer_d), (const gchar*)row[3]);
+		}
+	}
+	current_question = current_question + 1;
+}
+
 void join_exam(GtkButton* b, int exam_id) {
 	printf("Joining exam: %d \n", exam_id);
 	sprintf(sql_select, "SELECT ip_address, port_number FROM exams WHERE id=%d ", exam_id);
-	
+	exam_obj.id = exam_id;
 	if(mysql_query(conn, sql_select)) {
     	fprintf(stderr, "%s\n", mysql_error(conn)); 
   	}
@@ -499,32 +539,31 @@ void join_exam(GtkButton* b, int exam_id) {
 	}
 	//exam_ip[strcspn(exam_ip, "\n")] = 0;
 	exam_ip[strlen(exam_ip)-1] = 0;
-	/////////
-	int server_socket = 0, valread; 
-    struct sockaddr_in serv_addr; 
-    char *hello = "Hello from client"; 
+	
+	
     char buffer[1024] = {0}; 
-    if ((server_socket = socket(AF_INET, SOCK_STREAM, 0)) < 0) 
+    if ((c_server_socket = socket(AF_INET, SOCK_STREAM, 0)) < 0) 
     { 
         printf("\n Socket creation error \n"); 
         return -1; 
     } 
    
-    serv_addr.sin_family = AF_INET; 
-    serv_addr.sin_port = htons(PORT); 
+    c_serv_addr.sin_family = AF_INET; 
+    c_serv_addr.sin_port = htons(PORT); 
        
     // Convert IPv4 and IPv6 addresses from text to binary form 
-    if(inet_pton(AF_INET, exam_ip, &serv_addr.sin_addr)<=0)  
+    if(inet_pton(AF_INET, exam_ip, &c_serv_addr.sin_addr)<=0)  
     { 
         printf("\nInvalid address/ Address not supported \n"); 
         return -1; 
     } 
    
-    if (connect(server_socket, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) < 0) 
+    if (connect(c_server_socket, (struct sockaddr *)&c_serv_addr, sizeof(c_serv_addr)) < 0) 
     { 
         printf("\nConnection Failed \n"); 
         return -1; 
     } 
+	
 	char msg[128];
 	sprintf(msg, "$|%s", user_obj.id);
 	strcat(msg, "|");
@@ -534,11 +573,27 @@ void join_exam(GtkButton* b, int exam_id) {
 	strcat(msg, "|");
 	strncat(msg, user_obj.full_name, strlen(user_obj.full_name));
 	printf("%s\n", msg);
-	send(server_socket, msg, strlen(msg), 0);
-    valread = read(server_socket, buffer, 1024); 
-    printf("%s\n",buffer ); 
+	send(c_server_socket, msg, strlen(msg), 0);
+    gtk_widget_hide(st_window_panel);
+	get_next_question();
+    gtk_widget_show(window_exam);
 }
 
+void on_exam_answer_a_clicked(GtkButton *b) {
+	get_next_question();
+}
+void on_exam_answer_b_clicked(GtkButton *b) {
+	get_next_question();
+}
+void on_exam_answer_c_clicked(GtkButton *b) {
+	get_next_question();
+}
+void on_exam_answer_d_clicked(GtkButton *b) {
+	get_next_question();
+}
+void on_btn_next_question_clicked(GtkButton *b) {
+	get_next_question();
+}
 void get_professor_exams() {
 	sprintf(sql_select, "SELECT id, title FROM exams WHERE prof_id='%s'", user_obj.id);
 	if(mysql_query(conn, sql_select)) {
