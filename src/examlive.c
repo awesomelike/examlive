@@ -38,6 +38,7 @@ MYSQL_RES *res;
 MYSQL_ROW row;
 
 char sql_select[1024];
+char sql_insert[1024];
 char sql_update[1024];
 
 //Custom signal handlers
@@ -250,9 +251,8 @@ void request_handler_thread(void *s) {
 		gtk_widget_hide(grid_student_results);
 		gtk_grid_attach(GTK_GRID(grid_student_results), gtk_label_new((const gchar*)student->id), 0, exam_student_count, 1, 1);
 		gtk_grid_attach(GTK_GRID(grid_student_results), gtk_label_new((const gchar*)student->name), 1, exam_student_count, 1, 1);
+		student->table_position = exam_student_count;
 		gtk_widget_show_all(grid_student_results);
-		printf("student->id=%s\n", student->id);
-		printf("student->name=%s\n", student->name);
 		exam_student_count = exam_student_count + 1;
 		memset(recv_buffer, 0, MSG_LEN);
 	}
@@ -261,6 +261,31 @@ void request_handler_thread(void *s) {
 		int receive = recv(s_client_socket, recv_buffer, MSG_LEN, 0);
 		if(receive>0) {
 			printf("%s sent following answer: %s\n", student->name, recv_buffer);
+			char *temp_ans[6];
+			split_string(recv_buffer, temp_ans);
+			printf("%s\n", temp_ans[1]);
+			printf("%s\n", temp_ans[2]);
+			printf("%s\n", temp_ans[3]);
+			printf("%s\n", temp_ans[4]);
+			sprintf(sql_select, "SELECT exams.id AS exam_id, questions.question_number AS question_number, choices.letter, choices.is_correct FROM exams JOIN questions ON exams.id=questions.exam_id JOIN choices ON questions.id=choices.question_id WHERE exams.id=%d AND questions.question_number=%d AND choices.letter='%s'", atoi(temp_ans[2]), atoi(temp_ans[3]), temp_ans[4]);
+			if(mysql_query(conn, sql_select)) {
+				fprintf(stderr, "%s\n", mysql_error(conn));
+  			}
+			res = mysql_store_result(conn);
+			while ((row = mysql_fetch_row(res)))
+			{
+
+				int is_correct = atoi(row[3]);
+				int question_number = atoi(temp_ans[3]);
+				sprintf(sql_insert, "INSERT INTO responses(student_id, exam_id, answer, score, question_number) VALUES('%s', %d, '%s', %d, %d)", student->id, atoi(temp_ans[2]), temp_ans[4], is_correct, atoi(temp_ans[3]));
+				if(mysql_query(conn, sql_insert)) {
+					fprintf(stderr, "%s\n", mysql_error(conn));
+  				}
+				gtk_widget_hide(grid_student_results);
+				gtk_grid_attach(GTK_GRID(grid_student_results), gtk_label_new((const gchar*) row[3]), question_number + 1, student->table_position, 1, 1);
+				gtk_widget_show_all(grid_student_results);
+			}
+					
 		} else if(receive<0){
             printf("Fatal Error: -1\n");
         }

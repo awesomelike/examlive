@@ -12,6 +12,7 @@ typedef struct StudentNode
     char name[128];
     struct StudentNode* next;
     struct StudentNode* prev;
+    int table_position;
 } StudentList;
 
 StudentList *newNode(int sock_fd, char *ip) {
