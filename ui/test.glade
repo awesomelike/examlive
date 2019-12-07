@@ -223,33 +223,36 @@
                           <object class="GtkGrid" id="grid_student_results">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
-                            <property name="row_homogeneous">True</property>
+                            <property name="row_spacing">3</property>
+                            <property name="column_spacing">3</property>
+                            <property name="column_homogeneous">True</property>
                             <child>
-                              <placeholder/>
+                              <object class="GtkLabel">
+                                <property name="visible">True</property>
+                                <property name="can_focus">False</property>
+                                <property name="label" translatable="yes">Student ID</property>
+                                <attributes>
+                                  <attribute name="font-desc" value="Sans Bold 10"/>
+                                </attributes>
+                              </object>
+                              <packing>
+                                <property name="left_attach">0</property>
+                                <property name="top_attach">0</property>
+                              </packing>
                             </child>
                             <child>
-                              <placeholder/>
-                            </child>
-                            <child>
-                              <placeholder/>
-                            </child>
-                            <child>
-                              <placeholder/>
-                            </child>
-                            <child>
-                              <placeholder/>
-                            </child>
-                            <child>
-                              <placeholder/>
-                            </child>
-                            <child>
-                              <placeholder/>
-                            </child>
-                            <child>
-                              <placeholder/>
-                            </child>
-                            <child>
-                              <placeholder/>
+                              <object class="GtkLabel">
+                                <property name="visible">True</property>
+                                <property name="can_focus">False</property>
+                                <property name="label" translatable="yes">Student name</property>
+                                <attributes>
+                                  <attribute name="font-desc" value="Sans Bold 10"/>
+                                </attributes>
+                              </object>
+                              <packing>
+                                <property name="left_attach">1</property>
+                                <property name="top_attach">0</property>
+                              </packing>
                             </child>
                           </object>
                         </child>
@@ -282,6 +285,19 @@
                   <packing>
                     <property name="x">15</property>
                     <property name="y">15</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkButton" id="btn_test">
+                    <property name="label" translatable="yes">button</property>
+                    <property name="width_request">100</property>
+                    <property name="visible">True</property>
+                    <property name="can_focus">True</property>
+                    <property name="receives_default">True</property>
+                  </object>
+                  <packing>
+                    <property name="x">510</property>
+                    <property name="y">17</property>
                   </packing>
                 </child>
               </object>
