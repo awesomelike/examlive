@@ -237,10 +237,10 @@ void request_handler_thread(void *s) {
 		printf("%s\n", temp_arr[2]);
 		printf("%s\n", temp_arr[3]);
 		strncpy(student->name, temp_arr[3], (size_t)atoi(temp_arr[2]));
-		
+		gtk_widget_hide(grid_student_results);
 		gtk_grid_attach(GTK_GRID(grid_student_results), gtk_label_new((const gchar*)student->id), 0, exam_student_count, 1, 1);
 		gtk_grid_attach(GTK_GRID(grid_student_results), gtk_label_new((const gchar*)student->name), 1, exam_student_count, 1, 1);
-		
+		gtk_widget_show_all(grid_student_results);
 		printf("student->id=%s\n", student->id);
 		printf("student->name=%s\n", student->name);
 		exam_student_count = exam_student_count + 1;
@@ -263,8 +263,8 @@ void table_thread() {
 	i=1;
 	while (i<=num_questions)
 	{
-		char str_i[3];
-		sprintf(str_i, "%d", i);
+		char str_i[4];
+		sprintf(str_i, "Q%d", i);
 		gtk_grid_attach(GTK_GRID(grid_student_results), gtk_label_new((const gchar*)str_i), i+1, 0, 1, 1);
 		i=i+1;
 	}
@@ -272,7 +272,7 @@ void table_thread() {
 	gtk_widget_show_all(grid_student_results);
 }
 
-void socket_thread() {
+void server_socket_thread() {
 int server_fd, client_socket, valread; 
     struct sockaddr_in serv_address, client_address; 
     int opt = 1; 
@@ -347,10 +347,9 @@ void on_btn_start_exam_clicked (GtkButton *b) {
 	}
 	
 	//printf("%s\n", gtk_label_get_text(GTK_LABEL(gtk_grid_get_child_at(GTK_GRID(grid_student_results), 5, 0))));
-	//TODO start_socket()
 
 	pthread_t socket_tid;
-	if(pthread_create(&socket_tid, NULL, (void*)socket_thread, NULL)!=0) {
+	if(pthread_create(&socket_tid, NULL, (void*)server_socket_thread, NULL)!=0) {
 		perror("Thread error!");
 		exit(EXIT_FAILURE);
 	} 
