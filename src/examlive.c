@@ -282,7 +282,6 @@ void request_handler_thread(void *s) {
 					fprintf(stderr, "%s\n", mysql_error(conn));
   				}
 				gtk_widget_hide(grid_student_results);
-				//gtk_grid_attach(GTK_GRID(grid_student_results), gtk_label_new((const gchar*) row[3]), question_number + 1, student->table_position, 1, 1);
 				gtk_grid_attach(GTK_GRID(grid_student_results), strcmp(row[3], "0")?gtk_image_new_from_file((const gchar*)"./style/tick.png"):gtk_image_new_from_file((const gchar*)"./style/cross.png") , question_number + 1, student->table_position, 1, 1);
 				gtk_widget_show_all(grid_student_results);
 			}
