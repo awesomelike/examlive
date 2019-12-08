@@ -33,10 +33,12 @@ unsigned int port = 3306;
 static char *unix_socket = NULL;
 unsigned int flag = 0;
 
+//mysql connection
 MYSQL *conn;
 MYSQL_RES *res;
 MYSQL_ROW row;
 
+//sql request array
 char sql_select[1024];
 char sql_insert[1024];
 char sql_update[1024];
@@ -66,6 +68,12 @@ struct sockaddr_in s_serv_address, s_client_address;
 //Client side variables
 int c_server_socket = 0, valread; 
 struct sockaddr_in c_serv_addr; 
+
+//temp store for update data ///////
+char user_current_id[128];
+char user_current_password[128];
+char user_new_password[128];
+
 
 
 struct User
@@ -750,3 +758,57 @@ void split_string(char buf[], char* array[]){
         p = strtok (NULL, "|");
     }
 }
+
+//////////////////// student password handler ///////////////////////////////
+
+
+void on_st_current_id_changed(GtkEntry *ew){
+	gtk_label_set_text(GTK_LABEL(st_update_error_label), (const gchar*) "");
+	gtk_label_set_text(GTK_LABEL(st_update_success_label), (const gchar*) "");
+
+	sprintf(user_current_id, "%s", gtk_entry_get_text(ew));
+	
+}
+
+void on_st_current_pwd_changed(GtkEntry *er) {
+
+	gtk_label_set_text(GTK_LABEL(st_update_error_label), (const gchar*) "");
+	gtk_label_set_text(GTK_LABEL(st_update_success_label), (const gchar*) "");
+		
+	sprintf(user_current_password, "%s", gtk_entry_get_text(er));
+}
+		
+void on_st_new_pwd_changed(GtkEntry *ep){
+		
+	sprintf(user_new_password, "%s", gtk_entry_get_text(ep));
+	
+}
+void on_student_pwd_update_btn_clicked(GtkButton *e){
+
+	char sql_request[1024];
+
+	
+	if(user_current_id[0]=='S' &&
+	memcmp(user_id, user_current_id, sizeof(user_current_id))==0 &&
+    memcmp(user_password, user_current_password, sizeof(user_current_password))==0){
+		
+		sprintf(sql_request, "UPDATE students SET password='%s' WHERE id='%s'", user_new_password, user_obj.id);
+
+	if (mysql_query(conn, sql_request))
+		{            
+			mysql_errno(conn);   
+			gtk_label_set_text(GTK_LABEL(st_update_error_label), (const gchar*) "Low internet connection...");      
+		}        
+
+		res = mysql_use_result(conn);
+		mysql_free_result(res);
+		gtk_label_set_text(GTK_LABEL(st_update_success_label), (const gchar*) "you have successfully modified");
+		
+	}
+	else {
+		gtk_label_set_text(GTK_LABEL(st_update_error_label), (const gchar*) "invalid type or wrong password *");
+		
+	}
+	
+}
+//**************************** student password handler ********************//
