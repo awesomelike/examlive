@@ -15,10 +15,14 @@
 #include <netinet/in.h> 
 #include <arpa/inet.h>
 #include "components.h"
+#include "server.h"
 
 #define PORT 7777
 #define START 1
 #define FINISH 0
+
+#define MSG_LEN 1024
+
 
 //Database credentials
 static char *host = "db4free.net";
@@ -36,6 +40,7 @@ MYSQL_ROW row;
 
 //sql request array
 char sql_select[1024];
+char sql_insert[1024];
 char sql_update[1024];
 
 //Custom signal handlers
@@ -46,11 +51,24 @@ void clear_question_form();
 void get_professor_exams();
 void get_professor_courses();
 void get_ip_address(char *);
+void get_next_question();
 void split_string(char buf[], char* array[]);
 
 //Login panel variables
 char user_id[128];
 char user_password[128];
+
+//Variables to keep track of joined students
+StudentList *head, *cur;
+
+/*Global socket variables */
+//Server side variables
+int s_server_fd, s_client_socket, valread; 
+struct sockaddr_in s_serv_address, s_client_address;
+//Client side variables
+int c_server_socket = 0, valread; 
+struct sockaddr_in c_serv_addr; 
+
 
 struct User
 {
@@ -91,7 +109,9 @@ int main(int argc, char *argv[]) {
 	gtk_widget_set_sensitive(btn_add_question, FALSE);
 	gtk_widget_set_sensitive(btn_save_exam, FALSE);
     gtk_widget_show(login_window);
-
+	gtk_widget_hide(grid_student_results);
+	gtk_widget_set_sensitive(btn_test, FALSE);
+	gtk_builder_connect_signals(builder, NULL);
 	gtk_main();
 		
 	return 0;
@@ -120,7 +140,7 @@ void on_sign_in_clicked  (GtkButton *b) {
 			gtk_spinner_stop(GTK_SPINNER(login_spinner));
 			gtk_label_set_text(GTK_LABEL(login_label_error), (const gchar*) "Invalid user id, or password");
 			mysql_free_result(res);
-		} else { 
+		} else {     
 			//Successful authentication
 			row = mysql_fetch_row(res);
 			strcpy(user_obj.id, row[0]);
@@ -135,7 +155,9 @@ void on_sign_in_clicked  (GtkButton *b) {
 			gtk_label_set_text(GTK_LABEL(login_label_error), (const gchar*) "");
 			gtk_widget_hide(login_window);
 			gtk_spinner_stop(GTK_SPINNER(login_spinner));
-			gtk_widget_show(pr_window_panel);	
+			gtk_widget_show(pr_window_panel);
+				
+			//gtk_widget_show_all(grid_student_results);
 		}		
 	} else if (user_id[0]=='S')
 	{
@@ -212,105 +234,171 @@ void on_combo_start_quiz_changed (GtkComboBox *c) {
 	gtk_widget_set_sensitive(btn_start_exam, TRUE);
 }
 
-void on_btn_start_exam_clicked (GtkButton *b) {
-    update_exam_status(START);
-	
-	//TODO start_socket()
+int exam_student_count = 1;
+void request_handler_thread(void *s) {
+	char recv_buffer[MSG_LEN];
+	StudentList *student = (StudentList*) s;
+	if(recv(student->data, recv_buffer, MSG_LEN, 0) <=0) {
+		printf("%s\n","Wrong request");
+	} else if (recv_buffer[0]=='$') {
+		printf("%s\n","SERVER: Received a join request");
+		
+		char *temp_arr[4];
+		split_string(recv_buffer, temp_arr);
+		printf("%s\n", temp_arr[1]);
+		strncpy(student->id, temp_arr[1], (size_t)7);
+		printf("%s\n", temp_arr[2]);
+		printf("%s\n", temp_arr[3]);
+		strncpy(student->name, temp_arr[3], (size_t)atoi(temp_arr[2]));
+		gtk_widget_hide(grid_student_results);
+		gtk_grid_attach(GTK_GRID(grid_student_results), gtk_label_new((const gchar*)student->id), 0, exam_student_count, 1, 1);
+		gtk_grid_attach(GTK_GRID(grid_student_results), gtk_label_new((const gchar*)student->name), 1, exam_student_count, 1, 1);
+		student->table_position = exam_student_count;
+		gtk_widget_show_all(grid_student_results);
+		exam_student_count = exam_student_count + 1;
+		memset(recv_buffer, 0, MSG_LEN);
+	}
+	while (1)
+	{
+		int receive = recv(s_client_socket, recv_buffer, MSG_LEN, 0);
+		if(receive>0) {
+			printf("%s sent following answer: %s\n", student->name, recv_buffer);
+			char *temp_ans[6];
+			split_string(recv_buffer, temp_ans);
+			printf("%s\n", temp_ans[1]);
+			printf("%s\n", temp_ans[2]);
+			printf("%s\n", temp_ans[3]);
+			printf("%s\n", temp_ans[4]);
+			sprintf(sql_select, "SELECT exams.id AS exam_id, questions.question_number AS question_number, choices.letter, choices.is_correct FROM exams JOIN questions ON exams.id=questions.exam_id JOIN choices ON questions.id=choices.question_id WHERE exams.id=%d AND questions.question_number=%d AND choices.letter='%s'", atoi(temp_ans[2]), atoi(temp_ans[3]), temp_ans[4]);
+			if(mysql_query(conn, sql_select)) {
+				fprintf(stderr, "%s\n", mysql_error(conn));
+  			}
+			res = mysql_store_result(conn);
+			while ((row = mysql_fetch_row(res)))
+			{
 
-	int server_fd, new_socket, valread; 
-    struct sockaddr_in address; 
+				int is_correct = atoi(row[3]);
+				int question_number = atoi(temp_ans[3]);
+				sprintf(sql_insert, "INSERT INTO responses(student_id, exam_id, answer, score, question_number) VALUES('%s', %d, '%s', %d, %d)", student->id, atoi(temp_ans[2]), temp_ans[4], is_correct, atoi(temp_ans[3]));
+				if(mysql_query(conn, sql_insert)) {
+					fprintf(stderr, "%s\n", mysql_error(conn));
+  				}
+				gtk_widget_hide(grid_student_results);
+				gtk_grid_attach(GTK_GRID(grid_student_results), gtk_label_new((const gchar*) row[3]), question_number + 1, student->table_position, 1, 1);
+				gtk_widget_show_all(grid_student_results);
+			}
+					
+		} else if(receive<0){
+            printf("Fatal Error: -1\n");
+        }
+		
+	}
+	
+}
+void table_thread() {
+	sprintf(sql_select, "SELECT * FROM questions WHERE exam_id=%d", exam_obj.id);
+	if(mysql_query(conn, sql_select)) {
+		return fprintf(stderr, "%s\n", mysql_error(conn));
+		exit(EXIT_FAILURE);
+  	}
+	res = mysql_store_result(conn);
+	int num_questions = mysql_num_rows(res);
+	int i=1;
+	while (i<=num_questions)
+	{
+		gtk_grid_insert_column(GTK_GRID(grid_student_results), (gint)(i + 1));
+		i=i+1;
+	}
+	i=1;
+	while (i<=num_questions)
+	{
+		char str_i[4];
+		sprintf(str_i, "Q%d", i);
+		gtk_grid_attach(GTK_GRID(grid_student_results), gtk_label_new((const gchar*)str_i), i+1, 0, 1, 1);
+		i=i+1;
+	}
+	gtk_widget_set_sensitive(btn_test, TRUE);
+	gtk_widget_show_all(grid_student_results);
+}
+
+void server_socket_thread() {
     int opt = 1; 
-    int addrlen = sizeof(address); 
+    int s_server_addrlen = sizeof(s_serv_address);
+	int s_client_addrlen = sizeof(s_client_address); 
     char buffer[1024] = {0}; 
-    char *hello = "Hello from server"; 
        
-    // Creating socket file descriptor 
-    if ((server_fd = socket(AF_INET, SOCK_STREAM, 0)) == 0) 
+    // // Creating socket file descriptor 
+    if ((s_server_fd = socket(AF_INET, SOCK_STREAM, 0)) == 0) 
     { 
         perror("socket failed"); 
         exit(EXIT_FAILURE); 
     } 
-       
-    // Forcefully attaching socket to the port 8080 
-    if (setsockopt(server_fd, SOL_SOCKET, SO_REUSEADDR | SO_REUSEPORT, 
+    if (setsockopt(s_server_fd, SOL_SOCKET, SO_REUSEADDR | SO_REUSEPORT, 
                                                   &opt, sizeof(opt))) 
     { 
         perror("setsockopt"); 
         exit(EXIT_FAILURE); 
     } 
-    address.sin_family = AF_INET; 
-    address.sin_addr.s_addr = INADDR_ANY; 
-    address.sin_port = htons( PORT ); 
-       
-    // Forcefully attaching socket to the port 8080 
-    if (bind(server_fd, (struct sockaddr *)&address,  
-                                 sizeof(address))<0) 
+    s_serv_address.sin_family = AF_INET; 
+    s_serv_address.sin_addr.s_addr = INADDR_ANY; 
+    s_serv_address.sin_port = htons( PORT ); 
+    
+    if (bind(s_server_fd, (struct sockaddr *)&s_serv_address,  
+                                 sizeof(s_serv_address))<0) 
     { 
         perror("bind failed"); 
         exit(EXIT_FAILURE); 
     } 
-    if (listen(server_fd, 3) < 0) 
+    if (listen(s_server_fd, 5) < 0) 
     { 
         perror("listen"); 
         exit(EXIT_FAILURE); 
     }
-	while (TRUE)
+	char serv_ip[32];
+	get_ip_address(serv_ip);
+	head = newNode(s_server_fd, serv_ip);
+	cur = head;
+	
+	while (1)
 	{
-		if ((new_socket = accept(server_fd, (struct sockaddr *)&address,  
-						(socklen_t*)&addrlen))<0) 
-		{ 
+		if ((s_client_socket = accept(s_server_fd, (struct sockaddr *)&s_serv_address, (socklen_t*)&s_server_addrlen))<0) { 
 			perror("accept"); 
 			exit(EXIT_FAILURE); 
-		} 
-		valread = read( new_socket , buffer, 1024); 
-		printf("%s\n",buffer ); 
-		send(new_socket , hello , strlen(hello) , 0 ); 
-		printf("Hello message sent\n"); 
+		}
+
+		getpeername(s_client_socket, (struct sockaddr*) &s_client_address, (struct socklen_t*)&s_client_address);
+		printf("Client ip: %s\n", inet_ntoa(s_client_address.sin_addr)); 
+		
+		StudentList *s = newNode(s_client_socket, inet_ntoa(s_client_address.sin_addr));
+		s->prev = cur;
+		cur->next = s;
+		cur = s;
+
+		pthread_t threadID;
+		if(pthread_create(&threadID, NULL, (void*)request_handler_thread, (void*)s) != 0) {
+			perror("Thread creation error!\n");
+			exit(EXIT_FAILURE);
+		}
 	}
 	 
-    
-	// int server_sock;
-	// int client_sock;
-	// struct sockaddr_in serv_address;
-	// struct sockaddr_in client_address;
+}
 
-	// int client_len;
+void on_btn_start_exam_clicked (GtkButton *b) {
+    update_exam_status(START);
 	
-	// //pthread_t threadID;
+	pthread_t thread_populate;
+	if(pthread_create(&thread_populate, NULL, (void*)table_thread, NULL)!=0) {
+		perror("Thread error!");
+		exit(EXIT_FAILURE);
+	}
+	
+	//printf("%s\n", gtk_label_get_text(GTK_LABEL(gtk_grid_get_child_at(GTK_GRID(grid_student_results), 5, 0))));
 
-	// if((server_sock = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
-	// 	perror("Socket error"); 
-	// 	exit(EXIT_FAILURE);
-	// }
-
-	// serv_address.sin_family = AF_INET;
-	// serv_address.sin_addr.s_addr = INADDR_ANY;
-	// serv_address.sin_port = htons (PORT);
-
-	// if(bind(server_sock, (struct sockaddr*) &serv_address, sizeof(serv_address)) < 0) {
-	// 	perror("Socket error"); 
-	// 	exit(EXIT_FAILURE);
-	// }
-
-	// if(listen(server_sock, 5) < 0) {
-	// 	perror("Socket error"); 
-	// 	exit(EXIT_FAILURE);
-	// }
-	// for(;;) {
-	// 	printf("%s\n", "Waiting for students!");
-	// 	client_len = sizeof(client_address);
-	// 	// if((client_sock = accept(server_sock, (struct sockaddr*) &client_address, (socklen_t*)&client_len)) < 0) {
-	// 	// 	exit(EXIT_FAILURE);
-	// 	// }
-	// 	if ((client_sock = accept(server_sock, (struct sockaddr *)&serv_address,  
-    //                    (socklen_t*)&client_len)<0)) 
-    // 	{ 
-    //     	perror("accept"); 
-    //     	exit(EXIT_FAILURE); 
-    // 	} 
-	// 	/* now client is connected to the server */
-	// 	printf("Client IP=%s\n", inet_ntoa(client_address.sin_addr));
-	// }
+	pthread_t socket_tid;
+	if(pthread_create(&socket_tid, NULL, (void*)server_socket_thread, NULL)!=0) {
+		perror("Thread error!");
+		exit(EXIT_FAILURE);
+	} 
 }
 
 void *showSpinner(void *args) {
@@ -438,11 +526,57 @@ void get_online_exams() {
 	} 
 	mysql_free_result(res);
 }
+int current_question = 1;
+void get_next_question() {
+	
+	if(current_question <= get_question_count()) {
+		char temp[3];
+		sprintf(temp, "%d", current_question);
+		gtk_label_set_text(GTK_LABEL(label_exam_question_number), (const gchar*)temp);
+		
+		sprintf(sql_select, "SELECT id as question_id, question, choices.letter, choices.choice_value FROM questions JOIN choices ON questions.id=choices.question_id WHERE exam_id=%d AND question_number=%d", exam_obj.id, current_question);
+		if(mysql_query(conn, sql_select)) {
+			fprintf(stderr, "%s\n", mysql_error(conn)); 
+		}
+		
+		res = mysql_store_result(conn);
+		
+		while ((row = mysql_fetch_row(res)))
+		{
+			gtk_label_set_text(GTK_LABEL(label_exam_question), (const gchar*)row[1]);
+			if(strcmp(row[2], "A")==0) {
+				gtk_button_set_label(GTK_BUTTON(exam_answer_a), (const gchar*)row[3]);
+			}
+			if(strcmp(row[2], "B")==0) {
+				gtk_button_set_label(GTK_BUTTON(exam_answer_b), (const gchar*)row[3]);
+			}
+			if(strcmp(row[2], "C")==0) {
+				gtk_button_set_label(GTK_BUTTON(exam_answer_c), (const gchar*)row[3]);
+			}
+			if(strcmp(row[2], "D")==0) {
+				gtk_button_set_label(GTK_BUTTON(exam_answer_d), (const gchar*)row[3]);
+			}
+		}
+		current_question = current_question + 1;
+	} else
+	{
+		printf("Exam finished\n");
+	}
+}
+
+int get_question_count() {
+	sprintf(sql_select, "SELECT * FROM questions WHERE exam_id=%d", exam_obj.id);
+	mysql_query(conn, sql_select);
+	res = mysql_store_result(conn);
+	int num_rows = mysql_num_rows(res);
+	mysql_free_result(res);
+	return num_rows;
+}
 
 void join_exam(GtkButton* b, int exam_id) {
 	printf("Joining exam: %d \n", exam_id);
 	sprintf(sql_select, "SELECT ip_address, port_number FROM exams WHERE id=%d ", exam_id);
-	
+	exam_obj.id = exam_id;
 	if(mysql_query(conn, sql_select)) {
     	fprintf(stderr, "%s\n", mysql_error(conn)); 
   	}
@@ -457,64 +591,81 @@ void join_exam(GtkButton* b, int exam_id) {
 	}
 	//exam_ip[strcspn(exam_ip, "\n")] = 0;
 	exam_ip[strlen(exam_ip)-1] = 0;
-	/////////
-	int sock = 0, valread; 
-    struct sockaddr_in serv_addr; 
-    char *hello = "Hello from client"; 
+	
+	
     char buffer[1024] = {0}; 
-    if ((sock = socket(AF_INET, SOCK_STREAM, 0)) < 0) 
+    if ((c_server_socket = socket(AF_INET, SOCK_STREAM, 0)) < 0) 
     { 
         printf("\n Socket creation error \n"); 
         return -1; 
     } 
    
-    serv_addr.sin_family = AF_INET; 
-    serv_addr.sin_port = htons(PORT); 
+    c_serv_addr.sin_family = AF_INET; 
+    c_serv_addr.sin_port = htons(PORT); 
        
     // Convert IPv4 and IPv6 addresses from text to binary form 
-    if(inet_pton(AF_INET, exam_ip, &serv_addr.sin_addr)<=0)  
+    if(inet_pton(AF_INET, exam_ip, &c_serv_addr.sin_addr)<=0)  
     { 
         printf("\nInvalid address/ Address not supported \n"); 
         return -1; 
     } 
    
-    if (connect(sock, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) < 0) 
+    if (connect(c_server_socket, (struct sockaddr *)&c_serv_addr, sizeof(c_serv_addr)) < 0) 
     { 
         printf("\nConnection Failed \n"); 
         return -1; 
     } 
-    send(sock , hello , strlen(hello) , 0 ); 
-    printf("Hello message sent\n"); 
-    valread = read( sock , buffer, 1024); 
-    printf("%s\n",buffer ); 
 	
-	
-	// printf("%s\n", exam_ip);
-	// printf("%d\n", port);
-	// int sock = 0;
-	// struct sockaddr_in serv_addr;
-	
-	// if ((sock = socket(AF_INET, SOCK_STREAM, 0) < 0))
-	// {
-	// 	printf("%s\n", "Socket error");
-	// 	exit(EXIT_FAILURE);
-	// }
-	// serv_addr.sin_family = AF_INET;
-	// serv_addr.sin_port = port;
+	char msg[128];
+	sprintf(msg, "$|%s", user_obj.id);
+	strcat(msg, "|");
+	char len_str[2];
+	sprintf(len_str, "%d", strlen(user_obj.full_name));
+	strcat(msg, len_str);
+	strcat(msg, "|");
+	strncat(msg, user_obj.full_name, strlen(user_obj.full_name));
+	printf("%s\n", msg);
+	send(c_server_socket, msg, strlen(msg), 0);
+    gtk_widget_hide(st_window_panel);
+	get_next_question();
+    gtk_widget_show(window_exam);
+}
 
-	// if(inet_pton(AF_INET, "127.0.0.1", &serv_addr.sin_addr)<=0)  
-    // { 
-    //     printf("\nInvalid address/ Address not supported \n"); 
-    //     return -1; 
-    // } 
+void on_exam_answer_a_clicked(GtkButton *b) {
+	send_answer("A");	
+	get_next_question();
+}
+void on_exam_answer_b_clicked(GtkButton *b) {
+	send_answer("B");
+	get_next_question();
+}
+void on_exam_answer_c_clicked(GtkButton *b) {
+	send_answer("C");
+	get_next_question();
+}
+void on_exam_answer_d_clicked(GtkButton *b) {
+	send_answer("D");
+	get_next_question();
+}
+void on_btn_next_question_clicked(GtkButton *b) {
+	get_next_question();
+}
 
-	// if(connect(sock, (struct sockaddr *)&serv_addr, sizeof(serv_addr) < 0)) {
-	// 	printf("%s\n", "Connect error");
-	// 	exit(EXIT_FAILURE);
-	// }
+void send_answer(char *letter) {
+	char answer[128];
+	sprintf(answer, "@|%s|", user_obj.id);
 	
+	char exam_id_str[8];
+	sprintf(exam_id_str, "%d", exam_obj.id);
+	strncat(answer, exam_id_str, strlen(exam_id_str));
+	strcat(answer, "|");
 	
-
+	strcat(answer, gtk_label_get_text(GTK_LABEL(label_exam_question_number)));
+	strcat(answer, "|");
+	
+	strcat(answer, letter);
+	
+	send(c_server_socket, answer, strlen(answer), 0);
 }
 
 void get_professor_exams() {
@@ -584,8 +735,6 @@ void get_ip_address(char *buf) {
     while ((read = getline(&ip, &len, fp)) != -1) {
 
     }
-	printf("%d\n", strlen(ip));
-	printf("%s\n", ip);
     fclose(fp);
 	strcpy(buf, ip);
 	system("rm ip.txt");

@@ -43,6 +43,8 @@ GtkWidget *combo_start_quiz;
 GtkWidget *entry_combo_start_quiz;
 GtkWidget *liststore3;
 GtkWidget *btn_start_exam;
+GtkWidget *grid_student_results;
+GtkWidget *btn_test;
 
 //GTK student main menu
 GtkWidget *st_window_panel;
@@ -51,6 +53,17 @@ GtkWidget *st_id;
 GtkWidget *label_button_student;
 GtkWidget *grid_exams;
 GtkWidget *join_button[10];
+
+//GTK student exam
+GtkWidget *window_exam;
+GtkWidget *label_exam_course;
+GtkWidget *grid_exam_answers;
+GtkWidget *exam_answer_a;
+GtkWidget *exam_answer_b;
+GtkWidget *exam_answer_c;
+GtkWidget *exam_answer_d;
+GtkWidget *label_exam_question;
+GtkWidget *label_exam_question_number;
 
 //CSS values
 GtkCssProvider  *provider;
@@ -109,6 +122,8 @@ void initialize_components() {
 	entry_combo_start_quiz = GTK_WIDGET(gtk_builder_get_object(builder, "entry_combo_start_quiz"));
 	liststore3 = GTK_LIST_STORE(gtk_builder_get_object(builder, "liststore3"));
 	btn_start_exam = GTK_WIDGET(gtk_builder_get_object(builder, "btn_start_exam"));
+	grid_student_results = GTK_WIDGET(gtk_builder_get_object(builder, "grid_student_results"));
+	btn_test = GTK_WIDGET(gtk_builder_get_object(builder, "btn_test"));
 
 	//declare variable student panel
 	st_window_panel = GTK_WIDGET(gtk_builder_get_object(builder, "st_window_panel"));
@@ -117,6 +132,16 @@ void initialize_components() {
 	label_button_student = GTK_WIDGET(gtk_builder_get_object(builder, "leave_button_student"));
 	grid_exams = GTK_WIDGET(gtk_builder_get_object(builder, "grid_exams"));
 	
+	//declare variables exam panel
+	window_exam = GTK_WIDGET(gtk_builder_get_object(builder, "window_exam"));
+	label_exam_course = GTK_WIDGET(gtk_builder_get_object(builder, "label_exam_course"));
+	grid_exam_answers = GTK_WIDGET(gtk_builder_get_object(builder, "grid_exam_answers"));
+	exam_answer_a = GTK_WIDGET(gtk_builder_get_object(builder, "exam_answer_a"));
+	exam_answer_b = GTK_WIDGET(gtk_builder_get_object(builder, "exam_answer_b"));
+	exam_answer_c = GTK_WIDGET(gtk_builder_get_object(builder, "exam_answer_c"));
+	exam_answer_d = GTK_WIDGET(gtk_builder_get_object(builder, "exam_answer_d"));
+	label_exam_question = GTK_WIDGET(gtk_builder_get_object(builder, "label_exam_question"));
+	label_exam_question_number = GTK_WIDGET(gtk_builder_get_object(builder, "label_exam_question_number"));
 
 	//These lines used to connect CSS
     provider = gtk_css_provider_new();
