@@ -55,7 +55,7 @@
     box-shadow: none;
 
   }
-  #leave_btn:hover{
+#leave_btn:hover{
     
     background-color: #e02721;
     border: none;
@@ -63,4 +63,4 @@
     font-size: 20px;
     border-radius: 0;
 
-  }
+}
