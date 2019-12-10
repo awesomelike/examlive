@@ -187,16 +187,17 @@
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkButton" id="btn_test">
-                    <property name="label" translatable="yes">button</property>
+                  <object class="GtkButton" id="btn_finish_exam">
+                    <property name="label" translatable="yes">Finish</property>
                     <property name="width_request">100</property>
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">True</property>
+                    <signal name="clicked" handler="on_btn_finish_exam_clicked" swapped="no"/>
                   </object>
                   <packing>
-                    <property name="x">510</property>
-                    <property name="y">17</property>
+                    <property name="x">491</property>
+                    <property name="y">15</property>
                   </packing>
                 </child>
               </object>

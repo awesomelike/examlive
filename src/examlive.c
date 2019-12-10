@@ -76,7 +76,6 @@ char user_new_password[128];
 
 int session_id;
 
-
 struct User
 {
 	char id[7];
@@ -118,7 +117,7 @@ int main(int argc, char *argv[]) {
     gtk_widget_show(login_window);
 	gtk_widget_hide(grid_student_results);
 	gtk_widget_hide(spinner_results);
-	gtk_widget_set_sensitive(btn_test, FALSE);
+	gtk_widget_set_sensitive(btn_finish_exam, FALSE);
 	gtk_builder_connect_signals(builder, NULL);
 	gtk_main();
 		
@@ -264,7 +263,6 @@ void request_handler_thread(void *s) {
 		student->table_position = exam_student_count;
 		gtk_widget_show_all(grid_student_results);
 		exam_student_count = exam_student_count + 1;
-		//send(s_client_socket, )
 		memset(recv_buffer, 0, MSG_LEN);
 	}
 	while (1)
@@ -325,7 +323,8 @@ void table_thread() {
 		gtk_grid_attach(GTK_GRID(grid_student_results), gtk_label_new((const gchar*)str_i), i+1, 0, 1, 1);
 		i=i+1;
 	}
-	gtk_widget_set_sensitive(btn_test, TRUE);
+	gtk_widget_set_sensitive(btn_finish_exam, TRUE);
+	//gtk_widget_set_sensitive(btn_start_exam, FALSE);
 	gtk_widget_show_all(grid_student_results);
 }
 
@@ -779,7 +778,7 @@ void update_exam_status(int status) {
 		mysql_free_result(res);
 	} else if (status == FINISH) {
 		//Finish this session
-		sprintf(sql_insert, "UPDATE sessions SET finished_at=NOW()");
+		sprintf(sql_insert, "UPDATE sessions SET finished_at=NOW() WHERE id=%d", session_id);
 		if(mysql_query(conn, sql_insert)) {
 			fprintf(stderr, "%s\n", mysql_error(conn));
   		}
@@ -791,6 +790,17 @@ void update_exam_status(int status) {
 		}           
 		res = mysql_use_result(conn);
 		mysql_free_result(res);
+	}
+	
+}
+
+void on_btn_finish_exam_clicked(GtkButton *b) {
+	update_exam_status(FINISH);
+	StudentList *temp = head->next;
+	while (temp!=NULL)
+	{
+		printf("%d\n", temp->data);
+		temp = temp->next;
 	}
 	
 }
