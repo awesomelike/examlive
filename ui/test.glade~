@@ -519,9 +519,10 @@
                     <property name="orientation">vertical</property>
                     <property name="spacing">12</property>
                     <child>
-                      <object class="GtkEntry">
+                      <object class="GtkEntry" id="pr_current_id">
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
+                        <signal name="changed" handler="on_pr_current_id_changed" swapped="no"/>
                       </object>
                       <packing>
                         <property name="expand">False</property>
@@ -530,9 +531,10 @@
                       </packing>
                     </child>
                     <child>
-                      <object class="GtkEntry">
+                      <object class="GtkEntry" id="pr_current_pwd">
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
+                        <signal name="changed" handler="on_pr_current_pwd_changed" swapped="no"/>
                       </object>
                       <packing>
                         <property name="expand">False</property>
@@ -541,11 +543,12 @@
                       </packing>
                     </child>
                     <child>
-                      <object class="GtkEntry">
+                      <object class="GtkEntry" id="pr_new_pwd">
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
                         <property name="visibility">False</property>
                         <property name="invisible_char">•</property>
+                        <signal name="changed" handler="on_pr_new_pwd_changed" swapped="no"/>
                       </object>
                       <packing>
                         <property name="expand">False</property>
@@ -563,10 +566,10 @@
                   <object class="GtkLabel">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
-                    <property name="label" translatable="yes">Full Name</property>
+                    <property name="label" translatable="yes">Professor ID</property>
                   </object>
                   <packing>
-                    <property name="x">156</property>
+                    <property name="x">148</property>
                     <property name="y">90</property>
                   </packing>
                 </child>
@@ -594,17 +597,42 @@
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkButton">
+                  <object class="GtkButton" id="professor_pwd_update_btn">
                     <property name="label" translatable="yes">Update</property>
                     <property name="width_request">100</property>
                     <property name="height_request">40</property>
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">True</property>
+                    <signal name="clicked" handler="on_professor_pwd_update_btn_clicked" swapped="no"/>
+                  </object>
+                  <packing>
+                    <property name="x">249</property>
+                    <property name="y">241</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkLabel" id="pr_update_error_label">
+                    <property name="width_request">100</property>
+                    <property name="height_request">33</property>
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
                   </object>
                   <packing>
                     <property name="x">253</property>
-                    <property name="y">234</property>
+                    <property name="y">204</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkLabel" id="pr_update_success_label">
+                    <property name="width_request">100</property>
+                    <property name="height_request">36</property>
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                  </object>
+                  <packing>
+                    <property name="x">251</property>
+                    <property name="y">202</property>
                   </packing>
                 </child>
               </object>
@@ -1107,6 +1135,10 @@
                     <property name="height_request">28</property>
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
+                    <attributes>
+                      <attribute name="font-desc" value="Sans 11"/>
+                      <attribute name="foreground" value="#7373d2d21616"/>
+                    </attributes>
                   </object>
                   <packing>
                     <property name="x">289</property>
