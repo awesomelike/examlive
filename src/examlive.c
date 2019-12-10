@@ -880,3 +880,53 @@ void on_student_pwd_update_btn_clicked(GtkButton *e){
 	
 }
 //**************************** student password handler ********************//
+
+
+//////////////////// professor password handler ///////////////////////////////
+
+void on_pr_current_id_changed(GtkEntry *ew){
+	gtk_label_set_text(GTK_LABEL(pr_update_error_label), (const gchar*) "");
+	gtk_label_set_text(GTK_LABEL(pr_update_success_label), (const gchar*) "");
+
+	sprintf(user_current_id, "%s", gtk_entry_get_text(ew));
+}
+
+void on_pr_current_pwd_changed(GtkEntry *er) {
+
+	gtk_label_set_text(GTK_LABEL(pr_update_error_label), (const gchar*) "");
+	gtk_label_set_text(GTK_LABEL(pr_update_success_label), (const gchar*) "");
+		
+	sprintf(user_current_password, "%s", gtk_entry_get_text(er));
+}
+		
+void on_pr_new_pwd_changed(GtkEntry *ep){
+		
+	sprintf(user_new_password, "%s", gtk_entry_get_text(ep));
+	
+}
+void on_professor_pwd_update_btn_clicked(GtkButton *e){
+
+	if(user_current_id[0]=='P' &&
+	memcmp(user_id, user_current_id, sizeof(user_current_id))==0 &&
+    memcmp(user_password, user_current_password, sizeof(user_current_password))==0){
+		
+		sprintf(sql_select, "UPDATE professors SET password='%s' WHERE id='%s'", user_new_password, user_obj.id);
+
+	if (mysql_query(conn, sql_select))
+		{            
+			mysql_errno(conn);   
+			gtk_label_set_text(GTK_LABEL(pr_update_error_label), (const gchar*) "Low internet connection...");      
+		}        
+
+		res = mysql_use_result(conn);
+		mysql_free_result(res);
+		gtk_label_set_text(GTK_LABEL(pr_update_success_label), (const gchar*) "you have successfully modified");
+
+	}
+	else {
+		gtk_label_set_text(GTK_LABEL(pr_update_error_label), (const gchar*) "invalid type or wrong password *");
+		
+	}
+	
+}
+//**************************** student password handler ********************//

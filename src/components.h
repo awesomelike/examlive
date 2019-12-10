@@ -76,6 +76,13 @@ GtkWidget *student_pwd_update_btn;
 GtkWidget *st_update_error_label;
 GtkWidget *st_update_success_label;
 
+//GTK Student Password update panel
+GtkWidget *pr_current_id;
+GtkWidget *pr_current_pwd;
+GtkWidget *pr_new_pwd;
+GtkWidget *professor_pwd_update_btn;
+GtkWidget *pr_update_error_label;
+GtkWidget *pr_update_success_label;
 //CSS values
 GtkCssProvider  *provider;
 GdkScreen       *screen;
@@ -164,6 +171,15 @@ void initialize_components() {
 	student_pwd_update_btn = GTK_WIDGET(gtk_builder_get_object(builder, "student_pwd_update_btn"));
 	st_update_error_label = GTK_WIDGET(gtk_builder_get_object(builder, "st_update_error_label"));
 	st_update_success_label = GTK_WIDGET(gtk_builder_get_object(builder, "st_update_success_label"));
+
+	//declare student Password update panel
+	pr_current_id= GTK_WIDGET(gtk_builder_get_object(builder, "pr_current_id"));
+	pr_current_pwd = GTK_WIDGET(gtk_builder_get_object(builder, "pr_current_pwd"));
+	pr_new_pwd= GTK_WIDGET(gtk_builder_get_object(builder, "pr_new_pwd"));
+	professor_pwd_update_btn = GTK_WIDGET(gtk_builder_get_object(builder, "professor_pwd_update_btn"));
+	pr_update_error_label = GTK_WIDGET(gtk_builder_get_object(builder, "pr_update_error_label"));
+	pr_update_success_label = GTK_WIDGET(gtk_builder_get_object(builder, "pr_update_success_label"));
+
 	//These lines used to connect CSS
     provider = gtk_css_provider_new();
     display = gdk_display_get_default();
