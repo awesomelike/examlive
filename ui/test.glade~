@@ -993,10 +993,11 @@
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <child>
-                  <object class="GtkEntry">
+                  <object class="GtkEntry" id="st_current_id">
                     <property name="width_request">220</property>
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
+                    <signal name="changed" handler="on_st_current_id_changed" swapped="no"/>
                   </object>
                   <packing>
                     <property name="x">288</property>
@@ -1004,10 +1005,14 @@
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkEntry">
+                  <object class="GtkEntry" id="st_current_pwd">
+                    <property name="name">st_current_pwdst</property>
                     <property name="width_request">220</property>
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
+                    <property name="visibility">False</property>
+                    <property name="invisible_char">*</property>
+                    <signal name="changed" handler="on_st_current_pwd_changed" swapped="no"/>
                   </object>
                   <packing>
                     <property name="x">288</property>
@@ -1015,10 +1020,13 @@
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkEntry">
+                  <object class="GtkEntry" id="st_new_pwd">
                     <property name="width_request">220</property>
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
+                    <property name="visibility">False</property>
+                    <property name="invisible_char">*</property>
+                    <signal name="changed" handler="on_st_new_pwd_changed" swapped="no"/>
                   </object>
                   <packing>
                     <property name="x">288</property>
@@ -1026,16 +1034,18 @@
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkButton">
+                  <object class="GtkButton" id="student_pwd_update_btn">
                     <property name="label" translatable="yes">update</property>
-                    <property name="width_request">100</property>
+                    <property name="width_request">110</property>
+                    <property name="height_request">44</property>
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">True</property>
+                    <signal name="clicked" handler="on_student_pwd_update_btn_clicked" swapped="no"/>
                   </object>
                   <packing>
-                    <property name="x">272</property>
-                    <property name="y">222</property>
+                    <property name="x">260</property>
+                    <property name="y">241</property>
                   </packing>
                 </child>
                 <child>
@@ -1043,7 +1053,7 @@
                     <property name="width_request">100</property>
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
-                    <property name="label" translatable="yes">Full name</property>
+                    <property name="label" translatable="yes">Current ID</property>
                   </object>
                   <packing>
                     <property name="x">188</property>
@@ -1052,14 +1062,15 @@
                 </child>
                 <child>
                   <object class="GtkLabel">
-                    <property name="width_request">100</property>
+                    <property name="width_request">130</property>
+                    <property name="height_request">20</property>
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
                     <property name="label" translatable="yes">current password</property>
                   </object>
                   <packing>
-                    <property name="x">155</property>
-                    <property name="y">109</property>
+                    <property name="x">147</property>
+                    <property name="y">108</property>
                   </packing>
                 </child>
                 <child>
@@ -1072,6 +1083,34 @@
                   <packing>
                     <property name="x">174</property>
                     <property name="y">167</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkLabel" id="st_update_error_label">
+                    <property name="width_request">100</property>
+                    <property name="height_request">26</property>
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <attributes>
+                      <attribute name="font-desc" value="Sans 11"/>
+                      <attribute name="foreground" value="#cccc00000000"/>
+                    </attributes>
+                  </object>
+                  <packing>
+                    <property name="x">289</property>
+                    <property name="y">200</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkLabel" id="st_update_success_label">
+                    <property name="width_request">100</property>
+                    <property name="height_request">28</property>
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                  </object>
+                  <packing>
+                    <property name="x">289</property>
+                    <property name="y">200</property>
                   </packing>
                 </child>
               </object>
