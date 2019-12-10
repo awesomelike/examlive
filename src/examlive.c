@@ -162,8 +162,6 @@ void on_sign_in_clicked  (GtkButton *b) {
 			gtk_widget_hide(login_window);
 			gtk_spinner_stop(GTK_SPINNER(login_spinner));
 			gtk_widget_show(pr_window_panel);
-				
-			//gtk_widget_show_all(grid_student_results);
 		}		
 	} else if (user_id[0]=='S')
 	{
@@ -398,8 +396,6 @@ void on_btn_start_exam_clicked (GtkButton *b) {
 		exit(EXIT_FAILURE);
 	}
 	
-	//printf("%s\n", gtk_label_get_text(GTK_LABEL(gtk_grid_get_child_at(GTK_GRID(grid_student_results), 5, 0))));
-
 	pthread_t socket_tid;
 	if(pthread_create(&socket_tid, NULL, (void*)server_socket_thread, NULL)!=0) {
 		perror("Thread error!");
@@ -492,7 +488,6 @@ void on_leave_button_student_clicked(GtkButton *b) {
 	gtk_widget_hide(st_window_panel) ;
 	gtk_widget_show(login_window);
 }
-
 
 void clear_question_form() {
 	gtk_entry_set_text(GTK_ENTRY(entry_question), (const gchar*) "");
