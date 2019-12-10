@@ -1107,6 +1107,10 @@
                     <property name="height_request">28</property>
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
+                    <attributes>
+                      <attribute name="font-desc" value="Sans 11"/>
+                      <attribute name="foreground" value="#7373d2d21616"/>
+                    </attributes>
                   </object>
                   <packing>
                     <property name="x">289</property>
@@ -1225,21 +1229,6 @@
           </packing>
         </child>
         <child>
-          <object class="GtkLabel" id="label_exam_course">
-            <property name="visible">True</property>
-            <property name="can_focus">False</property>
-            <property name="label" translatable="yes">System Analysis</property>
-            <attributes>
-              <attribute name="font-desc" value="Sans 12"/>
-              <attribute name="foreground" value="#ffffffffffff"/>
-            </attributes>
-          </object>
-          <packing>
-            <property name="x">50</property>
-            <property name="y">18</property>
-          </packing>
-        </child>
-        <child>
           <object class="GtkGrid" id="grid_exam_answers">
             <property name="width_request">650</property>
             <property name="height_request">150</property>
@@ -1315,17 +1304,21 @@
         </child>
         <child>
           <object class="GtkLabel" id="label_exam_question">
-            <property name="width_request">901</property>
+            <property name="width_request">770</property>
+            <property name="height_request">153</property>
             <property name="visible">True</property>
             <property name="can_focus">False</property>
             <property name="label" translatable="yes">What is the definition of string?</property>
+            <property name="wrap">True</property>
+            <property name="wrap_mode">char</property>
             <attributes>
               <attribute name="font-desc" value="Sans Bold 19"/>
               <attribute name="foreground" value="#ffffffffffff"/>
             </attributes>
           </object>
           <packing>
-            <property name="y">95</property>
+            <property name="x">61</property>
+            <property name="y">80</property>
           </packing>
         </child>
         <child>
@@ -1341,6 +1334,76 @@
           <packing>
             <property name="x">422</property>
             <property name="y">45</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkGrid">
+            <property name="width_request">740</property>
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <property name="column_homogeneous">True</property>
+            <child>
+              <object class="GtkLabel" id="label_exam_course">
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+                <property name="label" translatable="yes">System Analysis</property>
+                <attributes>
+                  <attribute name="font-desc" value="Sans Bold 12"/>
+                  <attribute name="foreground" value="#ffffffffffff"/>
+                </attributes>
+              </object>
+              <packing>
+                <property name="left_attach">0</property>
+                <property name="top_attach">0</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkLabel" id="label_exam_title">
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+                <property name="label" translatable="yes">Exam title</property>
+                <attributes>
+                  <attribute name="font-desc" value="Sans Bold 12"/>
+                  <attribute name="foreground" value="#ffffffffffff"/>
+                </attributes>
+              </object>
+              <packing>
+                <property name="left_attach">1</property>
+                <property name="top_attach">0</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkLabel" id="label_exam_professor">
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+                <property name="label" translatable="yes">Exam professor</property>
+                <attributes>
+                  <attribute name="font-desc" value="Sans Bold 12"/>
+                  <attribute name="foreground" value="#ffffffffffff"/>
+                </attributes>
+              </object>
+              <packing>
+                <property name="left_attach">2</property>
+                <property name="top_attach">0</property>
+              </packing>
+            </child>
+          </object>
+          <packing>
+            <property name="x">67</property>
+            <property name="y">18</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkSpinner" id="spinner_results">
+            <property name="name">spinner</property>
+            <property name="width_request">100</property>
+            <property name="height_request">80</property>
+            <property name="can_focus">False</property>
+            <property name="active">True</property>
+          </object>
+          <packing>
+            <property name="x">377</property>
+            <property name="y">167</property>
           </packing>
         </child>
       </object>

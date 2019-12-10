@@ -25,10 +25,10 @@
 
 
 //Database credentials
-static char *host = "db4free.net";
-static char *user = "examlive";
+static char *host = "localhost";
+static char *user = "root";
 static char *dbname = "examlive";
-static char *pass = "examlive";
+static char *pass = "root";
 unsigned int port = 3306;
 static char *unix_socket = NULL;
 unsigned int flag = 0;
@@ -74,6 +74,7 @@ char user_current_id[128];
 char user_current_password[128];
 char user_new_password[128];
 
+int session_id;
 
 
 struct User
@@ -116,6 +117,7 @@ int main(int argc, char *argv[]) {
 	gtk_widget_set_sensitive(btn_save_exam, FALSE);
     gtk_widget_show(login_window);
 	gtk_widget_hide(grid_student_results);
+	gtk_widget_hide(spinner_results);
 	gtk_widget_set_sensitive(btn_test, FALSE);
 	gtk_builder_connect_signals(builder, NULL);
 	gtk_main();
@@ -246,7 +248,9 @@ void request_handler_thread(void *s) {
 		printf("%s\n","Wrong request");
 	} else if (recv_buffer[0]=='$') {
 		printf("%s\n","SERVER: Received a join request");
-		
+		char sess_str[64];
+		sprintf(sess_str, "%d", session_id);
+		send(student->data, sess_str, strlen(sess_str), 0);
 		char *temp_arr[4];
 		split_string(recv_buffer, temp_arr);
 		printf("%s\n", temp_arr[1]);
@@ -260,6 +264,7 @@ void request_handler_thread(void *s) {
 		student->table_position = exam_student_count;
 		gtk_widget_show_all(grid_student_results);
 		exam_student_count = exam_student_count + 1;
+		//send(s_client_socket, )
 		memset(recv_buffer, 0, MSG_LEN);
 	}
 	while (1)
@@ -280,10 +285,9 @@ void request_handler_thread(void *s) {
 			res = mysql_store_result(conn);
 			while ((row = mysql_fetch_row(res)))
 			{
-
 				int is_correct = atoi(row[3]);
 				int question_number = atoi(temp_ans[3]);
-				sprintf(sql_insert, "INSERT INTO responses(student_id, exam_id, answer, score, question_number) VALUES('%s', %d, '%s', %d, %d)", student->id, atoi(temp_ans[2]), temp_ans[4], is_correct, atoi(temp_ans[3]));
+				sprintf(sql_insert, "INSERT INTO responses(student_id, exam_id, answer, score, question_number, session_id) VALUES('%s', %d, '%s', %d, %d, %d)", student->id, atoi(temp_ans[2]), temp_ans[4], is_correct, atoi(temp_ans[3]), session_id);
 				if(mysql_query(conn, sql_insert)) {
 					fprintf(stderr, "%s\n", mysql_error(conn));
   				}
@@ -522,47 +526,42 @@ void get_online_exams() {
 		join_button[y] = gtk_button_new_with_label((const gchar*) "Join");
 		gtk_grid_attach(GTK_GRID(grid_exams), join_button[y], x, y, 1, 1);
 		int id = atoi(row[3]);
-		g_signal_connect(join_button[y], "clicked", G_CALLBACK(join_exam), id);
+		g_signal_connect(join_button[y], "clicked", G_CALLBACK(join_exam), y);
 		y = y + 1;
 	} 
 	mysql_free_result(res);
 }
 int current_question = 1;
 void get_next_question() {
+
+	char temp[3];
+	sprintf(temp, "%d", current_question);
+	gtk_label_set_text(GTK_LABEL(label_exam_question_number), (const gchar*)temp);
 	
-	if(current_question <= get_question_count()) {
-		char temp[3];
-		sprintf(temp, "%d", current_question);
-		gtk_label_set_text(GTK_LABEL(label_exam_question_number), (const gchar*)temp);
-		
-		sprintf(sql_select, "SELECT id as question_id, question, choices.letter, choices.choice_value FROM questions JOIN choices ON questions.id=choices.question_id WHERE exam_id=%d AND question_number=%d", exam_obj.id, current_question);
-		if(mysql_query(conn, sql_select)) {
-			fprintf(stderr, "%s\n", mysql_error(conn)); 
-		}
-		
-		res = mysql_store_result(conn);
-		
-		while ((row = mysql_fetch_row(res)))
-		{
-			gtk_label_set_text(GTK_LABEL(label_exam_question), (const gchar*)row[1]);
-			if(strcmp(row[2], "A")==0) {
-				gtk_button_set_label(GTK_BUTTON(exam_answer_a), (const gchar*)row[3]);
-			}
-			if(strcmp(row[2], "B")==0) {
-				gtk_button_set_label(GTK_BUTTON(exam_answer_b), (const gchar*)row[3]);
-			}
-			if(strcmp(row[2], "C")==0) {
-				gtk_button_set_label(GTK_BUTTON(exam_answer_c), (const gchar*)row[3]);
-			}
-			if(strcmp(row[2], "D")==0) {
-				gtk_button_set_label(GTK_BUTTON(exam_answer_d), (const gchar*)row[3]);
-			}
-		}
-		current_question = current_question + 1;
-	} else
-	{
-		printf("Exam finished\n");
+	sprintf(sql_select, "SELECT id as question_id, question, choices.letter, choices.choice_value FROM questions JOIN choices ON questions.id=choices.question_id WHERE exam_id=%d AND question_number=%d", exam_obj.id, current_question);
+	if(mysql_query(conn, sql_select)) {
+		fprintf(stderr, "%s\n", mysql_error(conn)); 
 	}
+	
+	res = mysql_store_result(conn);
+	
+	while ((row = mysql_fetch_row(res)))
+	{
+		gtk_label_set_text(GTK_LABEL(label_exam_question), (const gchar*)row[1]);
+		if(strcmp(row[2], "A")==0) {
+			gtk_button_set_label(GTK_BUTTON(exam_answer_a), (const gchar*)row[3]);
+		}
+		if(strcmp(row[2], "B")==0) {
+			gtk_button_set_label(GTK_BUTTON(exam_answer_b), (const gchar*)row[3]);
+		}
+		if(strcmp(row[2], "C")==0) {
+			gtk_button_set_label(GTK_BUTTON(exam_answer_c), (const gchar*)row[3]);
+		}
+		if(strcmp(row[2], "D")==0) {
+			gtk_button_set_label(GTK_BUTTON(exam_answer_d), (const gchar*)row[3]);
+		}
+	}
+	//current_question = current_question + 1;
 }
 
 int get_question_count() {
@@ -574,7 +573,30 @@ int get_question_count() {
 	return num_rows;
 }
 
-void join_exam(GtkButton* b, int exam_id) {
+void server_listener() {
+	char recv_buffer[MSG_LEN] = {};
+	char session_str[64];
+    if(recv(c_server_socket, recv_buffer, MSG_LEN, 0) <=0) {
+		printf("%s\n","Error");
+	} else {
+		session_id = atoi(recv_buffer);
+		memset(recv_buffer, 0, MSG_LEN);
+	}
+	while (1) {
+        int receive = recv(c_server_socket, recv_buffer, MSG_LEN, 0);
+        if (receive > 0) {
+            printf("\r%s\n", recv_buffer);
+
+        } else if (receive == 0) {
+            break;
+        } else { 
+             
+        }
+    }
+}
+
+void join_exam(GtkButton* b, int y) {
+	int exam_id = atoi(gtk_label_get_text(GTK_LABEL(gtk_grid_get_child_at(grid_exams, 3, y))));
 	printf("Joining exam: %d \n", exam_id);
 	sprintf(sql_select, "SELECT ip_address, port_number FROM exams WHERE id=%d ", exam_id);
 	exam_obj.id = exam_id;
@@ -592,7 +614,6 @@ void join_exam(GtkButton* b, int exam_id) {
 	}
 	//exam_ip[strcspn(exam_ip, "\n")] = 0;
 	exam_ip[strlen(exam_ip)-1] = 0;
-	
 	
     char buffer[1024] = {0}; 
     if ((c_server_socket = socket(AF_INET, SOCK_STREAM, 0)) < 0) 
@@ -617,6 +638,12 @@ void join_exam(GtkButton* b, int exam_id) {
         return -1; 
     } 
 	
+	pthread_t server_listener_thread;
+	if (pthread_create(&server_listener_thread, NULL, (void *) server_listener, NULL) != 0) {
+        printf ("Create pthread error!\n");
+        exit(EXIT_FAILURE);
+    }
+
 	char msg[128];
 	sprintf(msg, "$|%s", user_obj.id);
 	strcat(msg, "|");
@@ -628,25 +655,49 @@ void join_exam(GtkButton* b, int exam_id) {
 	printf("%s\n", msg);
 	send(c_server_socket, msg, strlen(msg), 0);
     gtk_widget_hide(st_window_panel);
+	gtk_label_set_text(GTK_LABEL(label_exam_course), (const gchar*)gtk_label_get_text(GTK_LABEL(gtk_grid_get_child_at(grid_exams, 1, y))));
+	gtk_label_set_text(GTK_LABEL(label_exam_title), (const gchar*)gtk_label_get_text(GTK_LABEL(gtk_grid_get_child_at(grid_exams, 2, y))));
+	gtk_label_set_text(GTK_LABEL(label_exam_professor), (const gchar*)gtk_label_get_text(GTK_LABEL(gtk_grid_get_child_at(grid_exams, 0, y))));
 	get_next_question();
     gtk_widget_show(window_exam);
 }
 
 void on_exam_answer_a_clicked(GtkButton *b) {
-	send_answer("A");	
-	get_next_question();
+	send_answer("A");
+	if(current_question + 1 <= get_question_count()) {
+		current_question = current_question + 1;
+		get_next_question();
+	} else {
+		client_get_results();
+	}
+	
 }
 void on_exam_answer_b_clicked(GtkButton *b) {
 	send_answer("B");
-	get_next_question();
+	if(current_question + 1 <= get_question_count()) {
+		current_question = current_question + 1;
+		get_next_question();
+	} else {
+		client_get_results();
+	}
 }
 void on_exam_answer_c_clicked(GtkButton *b) {
 	send_answer("C");
-	get_next_question();
+	if(current_question + 1 <= get_question_count()) {
+		current_question = current_question + 1;
+		get_next_question();
+	} else {
+		client_get_results();
+	}
 }
 void on_exam_answer_d_clicked(GtkButton *b) {
 	send_answer("D");
-	get_next_question();
+	if(current_question + 1 <= get_question_count()) {
+		current_question = current_question + 1;
+		get_next_question();
+	} else {
+		client_get_results();
+	}
 }
 void on_btn_next_question_clicked(GtkButton *b) {
 	get_next_question();
@@ -667,6 +718,13 @@ void send_answer(char *letter) {
 	strcat(answer, letter);
 	
 	send(c_server_socket, answer, strlen(answer), 0);
+}
+
+void client_get_results() {
+	gtk_widget_hide(grid_exam_answers);
+	gtk_widget_hide(label_exam_question_number);
+	gtk_label_set_text(GTK_LABEL(label_exam_question), (const gchar*)"You answered all questions!\nYou will get your results when the exam is finished...");
+	gtk_widget_show(spinner_results);
 }
 
 void get_professor_exams() {
@@ -696,7 +754,16 @@ void get_professor_courses() {
 }
 
 void update_exam_status(int status) {
+
 	if(status == START) {
+		
+		//Create new exam session
+		sprintf(sql_insert, "INSERT INTO sessions(started_at) VALUES(NOW())");
+		if(mysql_query(conn, sql_insert)) {
+			fprintf(stderr, "%s\n", mysql_error(conn));
+  		}
+		session_id = mysql_insert_id(conn);
+		
 		char ip[20];
 		get_ip_address(ip);
 		ip[strcspn(ip, "\n")] = 0;
@@ -711,6 +778,12 @@ void update_exam_status(int status) {
 		res = mysql_use_result(conn);
 		mysql_free_result(res);
 	} else if (status == FINISH) {
+		//Finish this session
+		sprintf(sql_insert, "UPDATE sessions SET finished_at=NOW()");
+		if(mysql_query(conn, sql_insert)) {
+			fprintf(stderr, "%s\n", mysql_error(conn));
+  		}
+
 		sprintf(sql_update, "UPDATE exams SET status=0 WHERE id=%d", exam_obj.id);
 		if (mysql_query(conn, sql_update))
 		{            

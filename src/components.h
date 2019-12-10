@@ -57,6 +57,8 @@ GtkWidget *join_button[10];
 //GTK student exam
 GtkWidget *window_exam;
 GtkWidget *label_exam_course;
+GtkWidget *label_exam_title;
+GtkWidget *label_exam_professor;
 GtkWidget *grid_exam_answers;
 GtkWidget *exam_answer_a;
 GtkWidget *exam_answer_b;
@@ -64,6 +66,7 @@ GtkWidget *exam_answer_c;
 GtkWidget *exam_answer_d;
 GtkWidget *label_exam_question;
 GtkWidget *label_exam_question_number;
+GtkWidget *spinner_results;
 
 //GTK Student Password update panel
 GtkWidget *st_current_id;
@@ -143,6 +146,8 @@ void initialize_components() {
 	//declare variables exam panel
 	window_exam = GTK_WIDGET(gtk_builder_get_object(builder, "window_exam"));
 	label_exam_course = GTK_WIDGET(gtk_builder_get_object(builder, "label_exam_course"));
+	label_exam_title = GTK_WIDGET(gtk_builder_get_object(builder, "label_exam_title"));
+	label_exam_professor = GTK_WIDGET(gtk_builder_get_object(builder, "label_exam_professor"));
 	grid_exam_answers = GTK_WIDGET(gtk_builder_get_object(builder, "grid_exam_answers"));
 	exam_answer_a = GTK_WIDGET(gtk_builder_get_object(builder, "exam_answer_a"));
 	exam_answer_b = GTK_WIDGET(gtk_builder_get_object(builder, "exam_answer_b"));
@@ -150,6 +155,7 @@ void initialize_components() {
 	exam_answer_d = GTK_WIDGET(gtk_builder_get_object(builder, "exam_answer_d"));
 	label_exam_question = GTK_WIDGET(gtk_builder_get_object(builder, "label_exam_question"));
 	label_exam_question_number = GTK_WIDGET(gtk_builder_get_object(builder, "label_exam_question_number"));
+	spinner_results = GTK_WIDGET(gtk_builder_get_object(builder, "spinner_results"));
 
 	//declare student Password update panel
 	st_current_id= GTK_WIDGET(gtk_builder_get_object(builder, "st_current_id"));
