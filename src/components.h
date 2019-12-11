@@ -67,6 +67,7 @@ GtkWidget *exam_answer_d;
 GtkWidget *label_exam_question;
 GtkWidget *label_exam_question_number;
 GtkWidget *spinner_results;
+GtkWidget *grid_exam_results;
 
 //GTK Student Password update panel
 GtkWidget *st_current_id;
@@ -163,6 +164,7 @@ void initialize_components() {
 	label_exam_question = GTK_WIDGET(gtk_builder_get_object(builder, "label_exam_question"));
 	label_exam_question_number = GTK_WIDGET(gtk_builder_get_object(builder, "label_exam_question_number"));
 	spinner_results = GTK_WIDGET(gtk_builder_get_object(builder, "spinner_results"));
+	grid_exam_results = GTK_WIDGET(gtk_builder_get_object(builder, "grid_exam_results"));
 
 	//declare student Password update panel
 	st_current_id= GTK_WIDGET(gtk_builder_get_object(builder, "st_current_id"));

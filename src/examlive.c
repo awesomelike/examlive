@@ -117,6 +117,7 @@ int main(int argc, char *argv[]) {
     gtk_widget_show(login_window);
 	gtk_widget_hide(grid_student_results);
 	gtk_widget_hide(spinner_results);
+	gtk_widget_hide(grid_exam_results);
 	gtk_widget_set_sensitive(btn_finish_exam, FALSE);
 	gtk_builder_connect_signals(builder, NULL);
 	gtk_main();
@@ -584,6 +585,32 @@ void server_listener() {
 	while (1) {
         int receive = recv(c_server_socket, recv_buffer, MSG_LEN, 0);
         if (receive > 0) {
+			if(recv_buffer[0]=='!') {
+				sprintf(sql_select, "SELECT student_id, SUM(score) AS total FROM responses WHERE session_id = %d GROUP BY(student_id) ORDER BY total DESC", session_id);
+				if(mysql_query(conn, sql_select)) {
+			    	fprintf(stderr, "%s\n", mysql_error(conn)); 
+  				}
+	
+				res = mysql_store_result(conn);
+				gtk_widget_hide(label_exam_question);
+				gtk_widget_hide(spinner_results);
+				int y=1;
+				while ((row = mysql_fetch_row(res)))
+				{
+					//printf("%s\n", row[0]);
+					//printf("%s\n", row[1]);
+					int x=0;
+					GtkWidget *label_temp1 = gtk_label_new((const gchar*) row[x]);
+					gtk_widget_set_name (label_temp1, (const gchar*)("text-white"));
+					gtk_grid_attach(GTK_GRID(grid_exam_results), label_temp1, x, y, 1, 1);
+					x = x + 1;
+					GtkWidget *label_temp2 = gtk_label_new((const gchar*) row[x]);
+					gtk_widget_set_name (label_temp2, (const gchar*)("text-white"));
+					gtk_grid_attach(GTK_GRID(grid_exam_results), label_temp2, x, y, 1, 1);
+					y = y + 1;
+				}
+				gtk_widget_show_all(grid_exam_results);
+			}
             printf("\r%s\n", recv_buffer);
 
         } else if (receive == 0) {
@@ -800,6 +827,7 @@ void on_btn_finish_exam_clicked(GtkButton *b) {
 	while (temp!=NULL)
 	{
 		printf("%d\n", temp->data);
+		send(temp->data, "!", 1, 0);
 		temp = temp->next;
 	}
 	
