@@ -70,6 +70,7 @@ GtkWidget *spinner_results;
 GtkWidget *grid_exam_results;
 GtkWidget *scroll_exam;
 GtkWidget *label_results_announced;
+GtkWidget *btn_finish;
 
 //GTK Student Password update panel
 GtkWidget *st_current_id;
@@ -169,6 +170,7 @@ void initialize_components() {
 	grid_exam_results = GTK_WIDGET(gtk_builder_get_object(builder, "grid_exam_results"));
 	scroll_exam = GTK_WIDGET(gtk_builder_get_object(builder, "scroll_exam"));
 	label_results_announced = GTK_WIDGET(gtk_builder_get_object(builder, "label_results_announced"));
+	btn_finish = GTK_WIDGET(gtk_builder_get_object(builder, "btn_finish"));
 
 	//declare student Password update panel
 	st_current_id= GTK_WIDGET(gtk_builder_get_object(builder, "st_current_id"));

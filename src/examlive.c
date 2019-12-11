@@ -118,6 +118,7 @@ int main(int argc, char *argv[]) {
 	gtk_widget_hide(grid_student_results);
 	gtk_widget_hide(spinner_results);
 	gtk_widget_hide(grid_exam_results);
+	gtk_widget_hide(btn_finish);
 	gtk_widget_hide(scroll_exam);
 	gtk_widget_hide(label_results_announced);
 	gtk_widget_set_sensitive(btn_finish_exam, FALSE);
@@ -550,18 +551,31 @@ void get_next_question() {
 	
 	while ((row = mysql_fetch_row(res)))
 	{
+		char answer[128];
 		gtk_label_set_text(GTK_LABEL(label_exam_question), (const gchar*)row[1]);
-		if(strcmp(row[2], "A")==0) {
-			gtk_button_set_label(GTK_BUTTON(exam_answer_a), (const gchar*)row[3]);
+		if(strcmp(row[2], "A")==0) {	
+			sprintf(answer, "A) ");
+			strcat(answer, row[3]);
+			gtk_button_set_label(GTK_BUTTON(exam_answer_a), (const gchar*)answer);
+			memset(answer, 0, 128);
 		}
 		if(strcmp(row[2], "B")==0) {
-			gtk_button_set_label(GTK_BUTTON(exam_answer_b), (const gchar*)row[3]);
+			sprintf(answer, "B) ");
+			strcat(answer, row[3]);
+			gtk_button_set_label(GTK_BUTTON(exam_answer_b), (const gchar*)answer);
+			memset(answer, 0, 128);
 		}
 		if(strcmp(row[2], "C")==0) {
-			gtk_button_set_label(GTK_BUTTON(exam_answer_c), (const gchar*)row[3]);
+			sprintf(answer, "C) ");
+			strcat(answer, row[3]);
+			gtk_button_set_label(GTK_BUTTON(exam_answer_c), (const gchar*)answer);
+			memset(answer, 0, 128);
 		}
 		if(strcmp(row[2], "D")==0) {
-			gtk_button_set_label(GTK_BUTTON(exam_answer_d), (const gchar*)row[3]);
+			sprintf(answer, "D) ");
+			strcat(answer, row[3]);
+			gtk_button_set_label(GTK_BUTTON(exam_answer_d), (const gchar*)answer);
+			memset(answer, 0, 128);
 		}
 	}
 	//current_question = current_question + 1;
@@ -620,6 +634,7 @@ void server_listener() {
 				gtk_widget_show(scroll_exam);
 				gtk_widget_show(label_results_announced);
 				gtk_widget_show_all(grid_exam_results);
+				gtk_widget_show(btn_finish);
 			}
 
         } else if (receive == 0) {
@@ -734,8 +749,8 @@ void on_exam_answer_d_clicked(GtkButton *b) {
 		hide_exam_grid();
 	}
 }
-void on_btn_next_question_clicked(GtkButton *b) {
-	get_next_question();
+void on_btn_finish_clicked(GtkButton *b) {
+	
 }
 
 void send_answer(char *letter) {
