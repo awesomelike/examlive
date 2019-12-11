@@ -99,7 +99,7 @@ int main(int argc, char *argv[]) {
 	//We refer to DB instance with this variable
 	conn = mysql_init(NULL);
 	if(!(mysql_real_connect(conn, host, user, pass, dbname, port, unix_socket, flag))) {
-		printf("%s\n", "some error there");
+		printf("%s\n", mysql_error(conn));
 		exit(1);
 	} else {
 		printf("%s\n", "DB conn established");
@@ -118,6 +118,8 @@ int main(int argc, char *argv[]) {
 	gtk_widget_hide(grid_student_results);
 	gtk_widget_hide(spinner_results);
 	gtk_widget_hide(grid_exam_results);
+	gtk_widget_hide(scroll_exam);
+	gtk_widget_hide(label_results_announced);
 	gtk_widget_set_sensitive(btn_finish_exam, FALSE);
 	gtk_builder_connect_signals(builder, NULL);
 	gtk_main();
@@ -524,6 +526,7 @@ void get_online_exams() {
 		gtk_grid_attach(GTK_GRID(grid_exams), gtk_image_new_from_icon_name((const gchar*) "software-update-available", 1), x, y, 1, 1);
 		x = x + 1;
 		join_button[y] = gtk_button_new_with_label((const gchar*) "Join");
+		gtk_widget_set_name (join_button[y], (const gchar*)("btn-primary"));
 		gtk_grid_attach(GTK_GRID(grid_exams), join_button[y], x, y, 1, 1);
 		int id = atoi(row[3]);
 		g_signal_connect(join_button[y], "clicked", G_CALLBACK(join_exam), y);
@@ -590,15 +593,10 @@ void server_listener() {
 				if(mysql_query(conn, sql_select)) {
 			    	fprintf(stderr, "%s\n", mysql_error(conn)); 
   				}
-	
 				res = mysql_store_result(conn);
-				gtk_widget_hide(label_exam_question);
-				gtk_widget_hide(spinner_results);
 				int y=1;
 				while ((row = mysql_fetch_row(res)))
 				{
-					//printf("%s\n", row[0]);
-					//printf("%s\n", row[1]);
 					int x=0;
 					GtkWidget *label_temp1 = gtk_label_new((const gchar*) row[x]);
 					gtk_widget_set_name (label_temp1, (const gchar*)("text-white"));
@@ -609,9 +607,20 @@ void server_listener() {
 					gtk_grid_attach(GTK_GRID(grid_exam_results), label_temp2, x, y, 1, 1);
 					y = y + 1;
 				}
+				if(gtk_widget_get_visible(spinner_results)) {
+					gtk_widget_hide(label_exam_question);
+					gtk_widget_hide(spinner_results);
+				} else
+				{
+					gtk_widget_hide(grid_exam_answers);
+					gtk_widget_hide(label_exam_question);
+					gtk_widget_hide(label_exam_question_number);
+				}
+				
+				gtk_widget_show(scroll_exam);
+				gtk_widget_show(label_results_announced);
 				gtk_widget_show_all(grid_exam_results);
 			}
-            printf("\r%s\n", recv_buffer);
 
         } else if (receive == 0) {
             break;
@@ -694,7 +703,7 @@ void on_exam_answer_a_clicked(GtkButton *b) {
 		current_question = current_question + 1;
 		get_next_question();
 	} else {
-		client_get_results();
+		hide_exam_grid();
 	}
 	
 }
@@ -704,7 +713,7 @@ void on_exam_answer_b_clicked(GtkButton *b) {
 		current_question = current_question + 1;
 		get_next_question();
 	} else {
-		client_get_results();
+		hide_exam_grid();
 	}
 }
 void on_exam_answer_c_clicked(GtkButton *b) {
@@ -713,7 +722,7 @@ void on_exam_answer_c_clicked(GtkButton *b) {
 		current_question = current_question + 1;
 		get_next_question();
 	} else {
-		client_get_results();
+		hide_exam_grid();
 	}
 }
 void on_exam_answer_d_clicked(GtkButton *b) {
@@ -722,7 +731,7 @@ void on_exam_answer_d_clicked(GtkButton *b) {
 		current_question = current_question + 1;
 		get_next_question();
 	} else {
-		client_get_results();
+		hide_exam_grid();
 	}
 }
 void on_btn_next_question_clicked(GtkButton *b) {
@@ -746,7 +755,7 @@ void send_answer(char *letter) {
 	send(c_server_socket, answer, strlen(answer), 0);
 }
 
-void client_get_results() {
+void hide_exam_grid() {
 	gtk_widget_hide(grid_exam_answers);
 	gtk_widget_hide(label_exam_question_number);
 	gtk_label_set_text(GTK_LABEL(label_exam_question), (const gchar*)"You answered all questions!\nYou will get your results when the exam is finished...");
@@ -830,7 +839,7 @@ void on_btn_finish_exam_clicked(GtkButton *b) {
 		send(temp->data, "!", 1, 0);
 		temp = temp->next;
 	}
-	
+	close(s_server_fd);
 }
 
 void get_ip_address(char *buf) {

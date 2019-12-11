@@ -18,6 +18,7 @@
 #login_btn {
     font-family: 'Open Sans';
     font-weight: bold;
+    border-radius: 4px;
 }
 #btn_ui{
     border: 0px solid;
@@ -69,4 +70,15 @@
 }
 #text-white {
     color: #FFFFFF;
+    font-size: 14px;
+}
+#btn-primary {
+    border-radius: 15px;
+    background-image: linear-gradient(to right, #00c6ff, #0072ff);
+    font-weight: bold;
+    border: 2px solid #ffffff;
+    color: #ffffff;
+}
+#btn-primary:hover {
+    background-image: linear-gradient(to right, #0072ff, #00c6ff);
 }
