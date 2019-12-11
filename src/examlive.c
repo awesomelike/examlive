@@ -697,19 +697,25 @@ void join_exam(GtkButton* b, int y) {
 	char msg[128];
 	sprintf(msg, "$|%s", user_obj.id);
 	strcat(msg, "|");
+	
 	char len_str[2];
 	sprintf(len_str, "%d", strlen(user_obj.full_name));
 	strcat(msg, len_str);
 	strcat(msg, "|");
 	strncat(msg, user_obj.full_name, strlen(user_obj.full_name));
 	printf("%s\n", msg);
+	
 	send(c_server_socket, msg, strlen(msg), 0);
-    gtk_widget_hide(st_window_panel);
+    
+	gtk_widget_hide(st_window_panel);
+
 	gtk_label_set_text(GTK_LABEL(label_exam_course), (const gchar*)gtk_label_get_text(GTK_LABEL(gtk_grid_get_child_at(grid_exams, 1, y))));
 	gtk_label_set_text(GTK_LABEL(label_exam_title), (const gchar*)gtk_label_get_text(GTK_LABEL(gtk_grid_get_child_at(grid_exams, 2, y))));
 	gtk_label_set_text(GTK_LABEL(label_exam_professor), (const gchar*)gtk_label_get_text(GTK_LABEL(gtk_grid_get_child_at(grid_exams, 0, y))));
+	
 	get_next_question();
-    gtk_widget_show(window_exam);
+    
+	gtk_widget_show(window_exam);
 }
 
 void on_exam_answer_a_clicked(GtkButton *b) {
