@@ -45,6 +45,7 @@ GtkWidget *liststore3;
 GtkWidget *btn_start_exam;
 GtkWidget *grid_student_results;
 GtkWidget *btn_finish_exam;
+GtkWidget *label_exam_finished;
 
 //GTK student main menu
 GtkWidget *st_window_panel;
@@ -146,6 +147,7 @@ void initialize_components() {
 	btn_start_exam = GTK_WIDGET(gtk_builder_get_object(builder, "btn_start_exam"));
 	grid_student_results = GTK_WIDGET(gtk_builder_get_object(builder, "grid_student_results"));
 	btn_finish_exam = GTK_WIDGET(gtk_builder_get_object(builder, "btn_finish_exam"));
+	label_exam_finished = GTK_WIDGET(gtk_builder_get_object(builder, "label_exam_finished"));
 
 	//declare variable student panel
 	st_window_panel = GTK_WIDGET(gtk_builder_get_object(builder, "st_window_panel"));

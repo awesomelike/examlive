@@ -71,6 +71,7 @@
 #text-white {
     color: #FFFFFF;
     font-size: 14px;
+    font-weight: bold;
 }
 #btn-primary {
     border-radius: 15px;

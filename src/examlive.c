@@ -26,7 +26,7 @@
 
 
 //Database credentials
-static char *host = "192.168.43.45";
+static char *host = "localhost";
 static char *user = "root";
 static char *dbname = "examlive";
 static char *pass = "root";
@@ -120,6 +120,7 @@ int main(int argc, char *argv[]) {
 	gtk_widget_hide(spinner_results);
 	gtk_widget_hide(grid_exam_results);
 	gtk_widget_hide(btn_finish);
+	gtk_widget_hide(label_exam_finished);
 	gtk_widget_hide(scroll_exam);
 	gtk_widget_hide(label_results_announced);
 	gtk_widget_set_sensitive(btn_finish_exam, FALSE);
@@ -301,7 +302,7 @@ void request_handler_thread(void *s) {
 			}
 					
 		} else if(receive==0){
-            fprintf(stderr, "request handler socket() failed: %s\n", strerror(errno));
+            //fprintf(stderr, "request handler socket() failed: %s\n", strerror(errno));
         } else
 		{
 			fprintf(stderr, "request handler socket() failed: %s\n", strerror(errno));
@@ -334,6 +335,7 @@ void table_thread() {
 		i=i+1;
 	}
 	gtk_widget_set_sensitive(btn_finish_exam, TRUE);
+	gtk_widget_set_sensitive(combo_course, FALSE);
 	//gtk_widget_set_sensitive(btn_start_exam, FALSE);
 	gtk_widget_show_all(grid_student_results);
 }
@@ -624,9 +626,16 @@ void server_listener() {
 					GtkWidget *label_temp2 = gtk_label_new((const gchar*) row[x]);
 					gtk_widget_set_name (label_temp2, (const gchar*)("text-white"));
 					gtk_grid_attach(GTK_GRID(grid_exam_results), label_temp2, x, y, 1, 1);
+					char temp[3];
+					sprintf(temp, "%d", y);
+					x = x + 1;
+					GtkWidget *label_temp3 = gtk_label_new((const gchar*) temp);
+					gtk_widget_set_name (label_temp3, (const gchar*)("text-white"));
+					gtk_grid_attach(GTK_GRID(grid_exam_results), label_temp3, x, y, 1, 1);
+					memset(temp, 0, 3);
 					y = y + 1;
 				}
-				if(gtk_widget_get_visible(spinner_results)) {
+				if(gtk_widget_is_visible(spinner_results)) {
 					gtk_widget_hide(label_exam_question);
 					gtk_widget_hide(spinner_results);
 				} else
@@ -645,7 +654,7 @@ void server_listener() {
 			}
 
         } else if (receive == 0) {
-            fprintf(stderr, "socket() failed: %s\n", strerror(errno));
+            //fprintf(stderr, "socket() failed: %s\n", strerror(errno));
 			break;
         } else { 
             fprintf(stderr, "socket() failed: %s\n", strerror(errno));
@@ -869,6 +878,10 @@ void on_btn_finish_exam_clicked(GtkButton *b) {
 		send(temp->fd, "!", 1, 0);
 		temp = temp->next;
 	}
+	gtk_widget_hide(btn_start_exam);
+	gtk_widget_show(label_exam_finished);
+	gtk_widget_set_sensitive(combo_course, FALSE);
+	gtk_widget_set_sensitive(btn_finish_exam, FALSE);
 	close(s_server_fd);
 }
 
