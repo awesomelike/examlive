@@ -8,6 +8,7 @@
 #include <fcntl.h> 
 #include <stdlib.h>
 #include <netdb.h> 
+#include <errno.h>
 #include <string.h>
 #include <ctype.h>
 #include <sys/socket.h> 
@@ -25,7 +26,7 @@
 
 
 //Database credentials
-static char *host = "localhost";
+static char *host = "192.168.43.45";
 static char *user = "root";
 static char *dbname = "examlive";
 static char *pass = "root";
@@ -247,13 +248,13 @@ int exam_student_count = 1;
 void request_handler_thread(void *s) {
 	char recv_buffer[MSG_LEN];
 	StudentList *student = (StudentList*) s;
-	if(recv(student->data, recv_buffer, MSG_LEN, 0) <=0) {
+	if(recv(student->fd, recv_buffer, MSG_LEN, 0) <=0) {
 		printf("%s\n","Wrong request");
 	} else if (recv_buffer[0]=='$') {
 		printf("%s\n","SERVER: Received a join request");
 		char sess_str[64];
 		sprintf(sess_str, "%d", session_id);
-		send(student->data, sess_str, strlen(sess_str), 0);
+		send(student->fd, sess_str, strlen(sess_str), 0);
 		char *temp_arr[4];
 		split_string(recv_buffer, temp_arr);
 		printf("%s\n", temp_arr[1]);
@@ -271,7 +272,7 @@ void request_handler_thread(void *s) {
 	}
 	while (1)
 	{
-		int receive = recv(s_client_socket, recv_buffer, MSG_LEN, 0);
+		int receive = recv(student->fd, recv_buffer, MSG_LEN, 0);
 		if(receive>0) {
 			printf("%s sent following answer: %s\n", student->name, recv_buffer);
 			char *temp_ans[6];
@@ -288,6 +289,7 @@ void request_handler_thread(void *s) {
 			while ((row = mysql_fetch_row(res)))
 			{
 				int is_correct = atoi(row[3]);
+				student->score += is_correct;
 				int question_number = atoi(temp_ans[3]);
 				sprintf(sql_insert, "INSERT INTO responses(student_id, exam_id, answer, score, question_number, session_id) VALUES('%s', %d, '%s', %d, %d, %d)", student->id, atoi(temp_ans[2]), temp_ans[4], is_correct, atoi(temp_ans[3]), session_id);
 				if(mysql_query(conn, sql_insert)) {
@@ -298,9 +300,13 @@ void request_handler_thread(void *s) {
 				gtk_widget_show_all(grid_student_results);
 			}
 					
-		} else if(receive<0){
-            printf("Fatal Error: -1\n");
-        }
+		} else if(receive==0){
+            fprintf(stderr, "request handler socket() failed: %s\n", strerror(errno));
+        } else
+		{
+			fprintf(stderr, "request handler socket() failed: %s\n", strerror(errno));
+		}
+		
 		
 	}
 	
@@ -578,7 +584,6 @@ void get_next_question() {
 			memset(answer, 0, 128);
 		}
 	}
-	//current_question = current_question + 1;
 }
 
 int get_question_count() {
@@ -630,6 +635,8 @@ void server_listener() {
 					gtk_widget_hide(label_exam_question);
 					gtk_widget_hide(label_exam_question_number);
 				}
+				//gtk_widget_hide(label_exam_question);
+				//gtk_widget_hide(spinner_results);
 				
 				gtk_widget_show(scroll_exam);
 				gtk_widget_show(label_results_announced);
@@ -638,9 +645,10 @@ void server_listener() {
 			}
 
         } else if (receive == 0) {
-            break;
+            fprintf(stderr, "socket() failed: %s\n", strerror(errno));
+			break;
         } else { 
-             
+            fprintf(stderr, "socket() failed: %s\n", strerror(errno));
         }
     }
 }
@@ -756,7 +764,7 @@ void on_exam_answer_d_clicked(GtkButton *b) {
 	}
 }
 void on_btn_finish_clicked(GtkButton *b) {
-	
+	exit(EXIT_SUCCESS);
 }
 
 void send_answer(char *letter) {
@@ -856,8 +864,9 @@ void on_btn_finish_exam_clicked(GtkButton *b) {
 	StudentList *temp = head->next;
 	while (temp!=NULL)
 	{
-		printf("%d\n", temp->data);
-		send(temp->data, "!", 1, 0);
+		printf("%d\n", temp->fd);
+		printf("%s\n", temp->ip);
+		send(temp->fd, "!", 1, 0);
 		temp = temp->next;
 	}
 	close(s_server_fd);
