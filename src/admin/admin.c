@@ -8,14 +8,15 @@
 #include <gtk/gtkx.h>
 #include <math.h>
 #include <time.h>
+#include <pthread.h>
 #include <ctype.h>
 #include <stdbool.h>
 
 //Database credentials
-static char *host = "db4free.net";
-static char *user = "examlive";
+static char *host = "localhost";
+static char *user = "root";
 static char *dbname = "examlive";
-static char *pass = "examlive";
+static char *pass = "root";
 unsigned int port = 3306;
 static char* unix_socket = NULL;
 unsigned int flag = 0;
@@ -77,6 +78,8 @@ GtkWidget	*window_course_added;
 GtkWidget	*fixed4;
 GtkWidget	*btn_main_menu1;
 
+void handle_sigint();
+
 //Vars to store values from add user page
 char user_type[1] = "S";
 char user_full_name[128];
@@ -115,6 +118,7 @@ int main(int argc, char *argv[]) {
 
 	gtk_init(&argc, &argv); // init Gtk
 
+	signal(SIGINT, handle_sigint);
 
 	builder = gtk_builder_new_from_file ("examlive-admin.glade");
  
@@ -178,7 +182,12 @@ int main(int argc, char *argv[]) {
 	gtk_main();
 
 	return EXIT_SUCCESS;
-	}
+}
+pthread_t pid;
+void handle_sigint() {
+	printf()
+	pthread_join(pid, NULL);
+}
 
 //Handlers in main menu
 void on_add_user_clicked (GtkButton *b) {
@@ -292,7 +301,7 @@ void on_btn_save_user_clicked (GtkButton *b) {
 			gtk_widget_hide(window_user);
 			gtk_widget_show(window_user_added);
 		} else {
-			printf("%s\n", "DB error!");
+			fprintf(stderr, "%s\n", mysql_error(conn));
 		}
 		res = mysql_use_result(conn);
         mysql_free_result(res);
@@ -323,7 +332,7 @@ void on_btn_save_user_clicked (GtkButton *b) {
 			gtk_widget_hide(window_user);
 			gtk_widget_show(window_user_added);
 		} else {
-			printf("%s\n", "DB error!");
+			fprintf(stderr, "%s\n", mysql_error(conn));
 		}
 		res = mysql_use_result(conn);
         mysql_free_result(res);
@@ -392,9 +401,10 @@ void get_students_table() {
 
 void get_courses_list(int top) {
 	sprintf(student_id_assign, "%s", gtk_label_get_text(GTK_LABEL(gtk_grid_get_child_at(grid_assign_table, 0, top))));
-	student_id_assign[6] = '\0';
+	//student_id_assign[6] = '\0';
 	sprintf(student_name_assign, "%s", gtk_label_get_text(GTK_LABEL(gtk_grid_get_child_at(grid_assign_table, 1, top))));
-	
+	printf("id: %s", student_id_assign);
+	printf("name: %s", student_name_assign);
 	gtk_label_set_text(GTK_LABEL(id_label_value), (const gchar*) student_id_assign);
 	gtk_label_set_text(GTK_LABEL(name_label_value), (const gchar*) student_name_assign);
 	if(mysql_query(conn, "SELECT * FROM courses")) {
@@ -428,19 +438,19 @@ void on_assign_course_clicked (GtkButton *b) {
 
 void on_assign_row_btn_clicked(GtkButton *b, int top) {
 	num_courses_assigned = 0;
+	printf("top=%d", top);
 	gtk_widget_hide(window_assign_course_table);
 	if(mysql_query(conn, "SELECT COUNT(id) FROM students WHERE id NOT IN (SELECT id FROM take)")) {
     	fprintf(stderr, "%s\n", mysql_error(conn)); 
   	}
 	res = mysql_store_result(conn);
-	while ((row = mysql_fetch_row(res)))
-	{
-		for (int k=1; k<=atoi(row[0]); k++) {
-			printf("%s\n", "inside the loop");
-			gtk_grid_remove_row(grid_assign_table, k);
-		}
-		printf("%d\n", atoi(row[0]));
-	}
+	// while ((row = mysql_fetch_row(res)))
+	// {
+	// 	for (int k=1; k<=atoi(row[0]); k++) {
+	// 		gtk_grid_remove_row(grid_assign_table, k);
+	// 	}
+	// 	printf("%d\n", atoi(row[0]));
+	// }
 	mysql_free_result(res);
 	get_courses_list(top);
 	gtk_widget_show_all(window_assign_course);	
@@ -459,9 +469,14 @@ void on_row_checked(GtkCheckButton* ch, int y) {
 		course_assigned_index = course_assigned_index - 1;
 	}
 }
+void new_admin() {
+	system("./admin");
+	pthread_detach(pthread_self());
+}
+
 void on_btn_course_assign_save_clicked(GtkButton *b) {
-	printf("%s\n", student_id_assign);
-	printf("%s\n", student_name_assign);
+	//printf("%s\n", student_id_assign);
+	//printf("%s\n", student_name_assign);
 	char sql_insert[1024];
 	for(int k=0; k<num_courses_assigned; k = k+1) {
 		sprintf(sql_insert,
@@ -469,38 +484,23 @@ void on_btn_course_assign_save_clicked(GtkButton *b) {
 			student_id_assign, 
 			course_id_to_be_assigned[k]);
 		if (mysql_query(conn, sql_insert)==0) {
-			printf("Course %d inserted successfully\n", course_id_to_be_assigned[k]);
+			//printf("Course %d inserted successfully\n", course_id_to_be_assigned[k]);
 		}	
 	}
-	num_courses_assigned = 0;
-	course_assigned_index = 0;
-	gtk_widget_hide(window_assign_course);
 
-	g_object_unref(grid_assign_table);
-	grid_assign_table = GTK_WIDGET(gtk_builder_get_object(builder, "grid_assign_table"));
+	gtk_widget_destroy(window_assign_course);
+	gtk_widget_hide(window_assign_course);
 	
-	//g_object_unref(grid_course_checkbox);
-	//grid_course_checkbox = GTK_WIDGET(gtk_builder_get_object(builder, "grid_course_checkbox"));
-	
-	//g_object_unref(checkbox);
-	if(mysql_query(conn, "SELECT COUNT(*) FROM courses")) {
-    	fprintf(stderr, "%s\n", mysql_error(conn)); 
-  	}
-	res = mysql_store_result(conn);
-	while ((row = mysql_fetch_row(res)))
-	{
-		for (int i=0; i<atoi(row[0]); i++) {
-			gtk_toggle_button_set_active (checkbox[i], false);
-		}
-	}
-	mysql_free_result(res);
-	
-	get_students_table();
-	gtk_widget_show_all(window_assign_course_table);
+	pthread_create(&pid, NULL, (void*)new_admin, NULL);
+	gtk_main_quit();
+	exit(EXIT_SUCCESS);
 }
 void on_btn_main_menu1_clicked(GtkButton *b) {	
-	gtk_widget_hide(window_course_added);
-	gtk_widget_show(admin_main);
+	//gtk_widget_hide(window_course_added);
+	//gtk_widget_show(admin_main);
+	system("./admin");
+	exit(EXIT_SUCCESS);
+	printf('after exit!\n');
 }
 
 void on_btn_back1_clicked (GtkButton *b) {
