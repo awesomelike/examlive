@@ -244,7 +244,7 @@ void on_combo_start_quiz_changed (GtkComboBox *c) {
 	exam_obj.id = atoi(gtk_combo_box_get_active_id(c));
 	gtk_widget_set_sensitive(btn_start_exam, TRUE);
 }
-
+int total_position;
 int exam_student_count = 1;
 void request_handler_thread(void *s) {
 	char recv_buffer[MSG_LEN];
@@ -267,6 +267,7 @@ void request_handler_thread(void *s) {
 		gtk_grid_attach(GTK_GRID(grid_student_results), gtk_label_new((const gchar*)student->id), 0, exam_student_count, 1, 1);
 		gtk_grid_attach(GTK_GRID(grid_student_results), gtk_label_new((const gchar*)student->name), 1, exam_student_count, 1, 1);
 		student->table_position = exam_student_count;
+		gtk_grid_attach(GTK_GRID(grid_student_results), gtk_label_new((const gchar*)"0"), total_position, student->table_position, 1, 1);
 		gtk_widget_show_all(grid_student_results);
 		exam_student_count = exam_student_count + 1;
 		memset(recv_buffer, 0, MSG_LEN);
@@ -298,6 +299,11 @@ void request_handler_thread(void *s) {
   				}
 				gtk_widget_hide(grid_student_results);
 				gtk_grid_attach(GTK_GRID(grid_student_results), strcmp(row[3], "0")?gtk_image_new_from_file((const gchar*)"./style/tick.png"):gtk_image_new_from_file((const gchar*)"./style/cross.png") , question_number + 1, student->table_position, 1, 1);
+				char score_temp[3];
+				sprintf(score_temp, "%d", student->score);
+				//gtk_grid_attach(GTK_GRID(grid_student_results), gtk_label_new((const gchar*)score_temp), total_position, student->table_position, 1, 1);
+				gtk_label_set_text(GTK_LABEL(gtk_grid_get_child_at(GTK_GRID(grid_student_results), total_position, student->table_position)), (const gchar*)score_temp);
+				memset(score_temp, 0, 3);				
 				gtk_widget_show_all(grid_student_results);
 			}
 					
@@ -334,6 +340,9 @@ void table_thread() {
 		gtk_grid_attach(GTK_GRID(grid_student_results), gtk_label_new((const gchar*)str_i), i+1, 0, 1, 1);
 		i=i+1;
 	}
+	gtk_grid_insert_column(GTK_GRID(grid_student_results), i);
+	total_position = i+2;
+	gtk_grid_attach(GTK_GRID(grid_student_results), gtk_label_new((const gchar*)"Total"), i+2, 0, 1, 1);
 	gtk_widget_set_sensitive(btn_finish_exam, TRUE);
 	gtk_widget_set_sensitive(combo_course, FALSE);
 	//gtk_widget_set_sensitive(btn_start_exam, FALSE);
@@ -876,8 +885,6 @@ void on_btn_refresh_clicked (GtkButton* b) {
 		get_online_exams();
 		gtk_widget_show_all(grid_exams);
 	}
-	
-	
 }
 
 void on_btn_finish_exam_clicked(GtkButton *b) {
