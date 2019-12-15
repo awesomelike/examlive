@@ -340,7 +340,7 @@ void table_thread() {
 		gtk_grid_attach(GTK_GRID(grid_student_results), gtk_label_new((const gchar*)str_i), i+1, 0, 1, 1);
 		i=i+1;
 	}
-	gtk_grid_insert_column(GTK_GRID(grid_student_results), i);
+	//gtk_grid_insert_column(GTK_GRID(grid_student_results), i);
 	total_position = i+2;
 	gtk_grid_attach(GTK_GRID(grid_student_results), gtk_label_new((const gchar*)"Total"), i+2, 0, 1, 1);
 	gtk_widget_set_sensitive(btn_finish_exam, TRUE);
