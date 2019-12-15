@@ -118,7 +118,6 @@ int main(int argc, char *argv[]) {
 
 	gtk_init(&argc, &argv); // init Gtk
 
-	signal(SIGINT, handle_sigint);
 
 	builder = gtk_builder_new_from_file ("examlive-admin.glade");
  
@@ -185,8 +184,8 @@ int main(int argc, char *argv[]) {
 }
 pthread_t pid;
 void handle_sigint() {
-	printf()
-	pthread_join(pid, NULL);
+	//printf()
+	//pthread_join(pid, NULL);
 }
 
 //Handlers in main menu
