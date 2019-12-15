@@ -991,6 +991,20 @@
                     <property name="y">35</property>
                   </packing>
                 </child>
+                <child>
+                  <object class="GtkButton" id="btn_refresh">
+                    <property name="label" translatable="yes">Refresh</property>
+                    <property name="width_request">100</property>
+                    <property name="visible">True</property>
+                    <property name="can_focus">True</property>
+                    <property name="receives_default">True</property>
+                    <signal name="clicked" handler="on_btn_refresh_clicked" swapped="no"/>
+                  </object>
+                  <packing>
+                    <property name="x">510</property>
+                    <property name="y">3</property>
+                  </packing>
+                </child>
               </object>
               <packing>
                 <property name="name">page0</property>

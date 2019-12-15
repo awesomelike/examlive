@@ -868,6 +868,18 @@ void update_exam_status(int status) {
 	
 }
 
+void on_btn_refresh_clicked (GtkButton* b) {
+	if(gtk_grid_get_child_at(GTK_GRID(grid_exams), 0, 1)) {
+		gtk_grid_remove_row(GTK_GRID(grid_exams), 0);
+	} else
+	{
+		get_online_exams();
+		gtk_widget_show_all(grid_exams);
+	}
+	
+	
+}
+
 void on_btn_finish_exam_clicked(GtkButton *b) {
 	update_exam_status(FINISH);
 	StudentList *temp = head->next;
