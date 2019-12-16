@@ -73,6 +73,8 @@ GtkWidget *scroll_exam;
 GtkWidget *label_results_announced;
 GtkWidget *btn_finish;
 
+GtkWidget *grid_history_student;
+
 //GTK Student Password update panel
 GtkWidget *st_current_id;
 GtkWidget *st_current_pwd;
@@ -162,6 +164,8 @@ void initialize_components() {
 	label_button_student = GTK_WIDGET(gtk_builder_get_object(builder, "leave_button_student"));
 	grid_exams = GTK_WIDGET(gtk_builder_get_object(builder, "grid_exams"));
 	
+	grid_history_student = GTK_WIDGET(gtk_builder_get_object(builder, "grid_history_student"));
+
 	//declare variables exam panel
 	window_exam = GTK_WIDGET(gtk_builder_get_object(builder, "window_exam"));
 	label_exam_course = GTK_WIDGET(gtk_builder_get_object(builder, "label_exam_course"));

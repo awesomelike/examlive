@@ -52,10 +52,12 @@ void clear_question_form();
 void get_professor_exams();
 void append_new_exam();
 void get_history();
+void get_student_history();
 void get_professor_courses();
 void get_ip_address(char *);
 void get_next_question();
 void split_string(char buf[], char* array[]);
+void signal_handler(int);
 
 //Login panel variables
 char user_id[128];
@@ -71,6 +73,8 @@ struct sockaddr_in s_serv_address, s_client_address;
 //Client side variables
 int c_server_socket = 0, valread; 
 struct sockaddr_in c_serv_addr; 
+
+int GLOBAL_EXAM_STATUS;
 
 //temp store for update data ///////
 char user_current_id[128];
@@ -109,7 +113,9 @@ int main(int argc, char *argv[]) {
 	}
 	
 	gtk_init(&argc, &argv); 
- 
+	
+	signal(SIGINT, signal_handler);
+
 	initialize_components();
    
 	gtk_widget_set_sensitive(btn_start_exam, FALSE);
@@ -134,6 +140,13 @@ int main(int argc, char *argv[]) {
 int row_count;
 
 gint x, y;
+
+void signal_handler(int sig) {
+	if(GLOBAL_EXAM_STATUS==START && user_obj.id[0]=='P') {
+		update_exam_status(FINISH);
+	}
+	exit(EXIT_SUCCESS);
+}
 
 void on_sign_in_clicked  (GtkButton *b) {
 	gtk_widget_show(login_spinner);
@@ -163,8 +176,11 @@ void on_sign_in_clicked  (GtkButton *b) {
 			mysql_free_result(res);
 			
 			get_professor_courses();
+			
 			get_professor_exams();
+			
 			get_history();
+			
 			gtk_label_set_text(GTK_LABEL(label_prof_id), (const gchar*) user_obj.id);
 			gtk_label_set_text(GTK_LABEL(label_prof_name), (const gchar*) user_obj.full_name);
 			gtk_label_set_text(GTK_LABEL(login_label_error), (const gchar*) "");
@@ -196,7 +212,11 @@ void on_sign_in_clicked  (GtkButton *b) {
 			gtk_label_set_text(GTK_LABEL(login_label_error), (const gchar*) "");
 			mysql_free_result(res);
 			gtk_widget_hide(login_window);
+			
+			get_student_history();
+			
 			get_online_exams();
+			
 			gtk_widget_show_all(st_window_panel);	
 		}
 	} else {
@@ -491,29 +511,16 @@ void on_btn_save_exam_clicked (GtkButton *b) {
 }
 
 void on_leave_button_clicked(GtkButton *b){
-
+	exit(EXIT_SUCCESS);
 //pr windows current position state
 	// gtk_window_get_position(pr_window_panel, &x, &y);
 	// gtk_window_move (login_window, x , y);
 	
 //window switches
-	sprintf(user_obj.full_name, "");
-	sprintf(user_obj.full_name, "");
-	gtk_entry_set_text(GTK_ENTRY(login_username), (const gchar*) "");
-	gtk_entry_set_text(GTK_ENTRY(login_password), (const gchar*) "");
-	gtk_widget_hide(pr_window_panel);
-	gtk_list_store_clear(GTK_LIST_STORE(liststore2));
-	gtk_list_store_clear(GTK_LIST_STORE(liststore3));
-	gtk_widget_show(login_window);
 
 }
 void on_leave_button_student_clicked(GtkButton *b) {
-	sprintf(user_obj.full_name, "");
-	sprintf(user_obj.full_name, "");
-	gtk_entry_set_text(GTK_ENTRY(login_username), (const gchar*) "");
-	gtk_entry_set_text(GTK_ENTRY(login_password), (const gchar*) "");
-	gtk_widget_hide(st_window_panel) ;
-	gtk_widget_show(login_window);
+	exit(EXIT_SUCCESS);
 }
 
 void clear_question_form() {
@@ -855,6 +862,8 @@ void update_exam_status(int status) {
 
 	if(status == START) {
 		
+		GLOBAL_EXAM_STATUS = START;
+		
 		gtk_widget_set_sensitive(combo_start_quiz, FALSE);
 		gtk_widget_set_sensitive(btn_start_exam, FALSE);
 		//Create new exam session
@@ -883,7 +892,7 @@ void update_exam_status(int status) {
 		if(mysql_query(conn, sql_insert)) {
 			fprintf(stderr, "%s\n", mysql_error(conn));
   		}
-
+		GLOBAL_EXAM_STATUS = START;
 		sprintf(sql_update, "UPDATE exams SET status=0 WHERE id=%d", exam_obj.id);
 		if (mysql_query(conn, sql_update))
 		{            
@@ -954,6 +963,84 @@ void split_string(char buf[], char* array[]){
     }
 }
 
+int session_history_id;
+int history_count = 0;
+void on_combo_history_changed(GtkComboBox *c) {
+	session_history_id = atoi(gtk_combo_box_get_active_id(combo_history));
+	printf("%d\n", session_history_id);
+	
+	if(history_count!=0) {
+		for(int i=1; i<=history_count; i++) {
+			gtk_grid_remove_row(grid_history, i);
+		}
+		gtk_widget_show_all(grid_history);
+	}
+	
+	sprintf(sql_select, "SELECT R.student_id, students.full_name, SUM(R.score) AS total, R.exam_id, R.session_id, S.started_at, E.title FROM responses R JOIN exams E ON R.exam_id=E.id JOIN students ON students.id=R.student_id JOIN sessions S ON S.id=R.session_id GROUP BY R.student_id, R.session_id HAVING (R.exam_id IN (SELECT exams.id FROM exams WHERE exams.prof_id='%s')) AND R.session_id=%d", user_obj.id, session_history_id);
+	if(mysql_query(conn, sql_select)) {
+    	fprintf(stderr, "%s\n", mysql_error(conn));
+		return;
+  	}
+	res = mysql_store_result(conn);  
+	history_count = mysql_num_rows(res);
+	
+	int y=1;
+	while ((row = mysql_fetch_row(res)))
+	{
+		int x=0;
+		gtk_grid_attach(GTK_GRID(grid_history), gtk_label_new((const gchar*) row[x]), x, y, 1, 1);
+		x = x + 1;
+		gtk_grid_attach(GTK_GRID(grid_history), gtk_label_new((const gchar*) row[x]), x, y, 1, 1);
+		x = x + 1;
+		gtk_grid_attach(GTK_GRID(grid_history), gtk_label_new((const gchar*) row[x]), x, y, 1, 1);
+		y = y + 1;
+	}
+	gtk_widget_show_all(grid_history);
+}
+
+void get_history() {
+	sprintf(sql_select, "SELECT R.student_id, SUM(R.score) AS total, R.exam_id, R.session_id, S.started_at, E.title FROM responses R JOIN exams E ON R.exam_id=E.id JOIN sessions S ON S.id=R.session_id GROUP BY R.student_id, R.session_id HAVING (R.exam_id IN (SELECT exams.id FROM exams WHERE exams.prof_id='%s'))", user_obj.id);
+	if(mysql_query(conn, sql_select)) {
+    	fprintf(stderr, "%s\n", mysql_error(conn));
+		return;
+  	}
+	res = mysql_store_result(conn);
+	
+	while ((row = mysql_fetch_row(res)))
+	{
+		char temp[128];
+		sprintf(temp, row[4]);
+		strcat(temp, " ");
+		strcat(temp, row[5]);
+		gtk_list_store_insert_with_values(GTK_LIST_STORE(liststore4), NULL, -1, 0, row[3], 1, temp, -1);		
+		memset(temp, 0, 128);
+	}
+	mysql_free_result(res);
+}
+
+void get_student_history() {
+	sprintf(sql_select, "SELECT R.student_id, SUM(R.score) AS total, C.title, E.title, R.exam_id, R.session_id, S.started_at FROM responses R JOIN exams E ON R.exam_id=E.id JOIN courses C ON C.id=E.course_id JOIN sessions S ON S.id=R.session_id GROUP BY R.student_id, R.session_id HAVING R.student_id='%s'", user_obj.id);
+	if(mysql_query(conn, sql_select)) {
+    	fprintf(stderr, "%s\n", mysql_error(conn));
+		return;
+  	}
+	res = mysql_store_result(conn);
+	int y=1;
+	while ((row = mysql_fetch_row(res)))
+	{
+		int x=0;
+		gtk_grid_attach(GTK_GRID(grid_history_student), gtk_label_new((const gchar*) row[2]), x, y, 1, 1);
+		x = x + 1;
+		gtk_grid_attach(GTK_GRID(grid_history_student), gtk_label_new((const gchar*) row[3]), x, y, 1, 1);
+		x = x + 1;
+		gtk_grid_attach(GTK_GRID(grid_history_student), gtk_label_new((const gchar*) row[1]), x, y, 1, 1);
+		x = x + 1;
+		gtk_grid_attach(GTK_GRID(grid_history_student), gtk_label_new((const gchar*) row[6]), x, y, 1, 1);
+		y = y + 1;
+	}
+	gtk_widget_show_all(grid_history_student);	
+}
+
 //////////////////// student password handler ///////////////////////////////
 
 
@@ -1006,61 +1093,7 @@ void on_student_pwd_update_btn_clicked(GtkButton *e){
 	}
 	
 }
-int session_history_id;
-int history_count = 0;
-void on_combo_history_changed(GtkComboBox *c) {
-	session_history_id = atoi(gtk_combo_box_get_active_id(combo_history));
-	printf("%d\n", session_history_id);
-	
-	if(history_count!=0) {
-		//gtk_widget_hide(grid_history);
-		for(int i=1; i<=history_count; i++) {
-			gtk_grid_remove_row(grid_history, i);
-		}
-		gtk_widget_show_all(grid_history);
-	}
-	
-	sprintf(sql_select, "SELECT R.student_id, students.full_name, SUM(R.score) AS total, R.exam_id, R.session_id, S.started_at, E.title FROM responses R JOIN exams E ON R.exam_id=E.id JOIN students ON students.id=R.student_id JOIN sessions S ON S.id=R.session_id GROUP BY R.student_id, R.session_id HAVING (R.exam_id IN (SELECT exams.id FROM exams WHERE exams.prof_id='%s')) AND R.session_id=%d", user_obj.id, session_history_id);
-	if(mysql_query(conn, sql_select)) {
-    	fprintf(stderr, "%s\n", mysql_error(conn));
-		return;
-  	}
-	res = mysql_store_result(conn);  
-	history_count = mysql_num_rows(res);
-	
-	int y=1;
-	while ((row = mysql_fetch_row(res)))
-	{
-		int x=0;
-		gtk_grid_attach(GTK_GRID(grid_history), gtk_label_new((const gchar*) row[x]), x, y, 1, 1);
-		x = x + 1;
-		gtk_grid_attach(GTK_GRID(grid_history), gtk_label_new((const gchar*) row[x]), x, y, 1, 1);
-		x = x + 1;
-		gtk_grid_attach(GTK_GRID(grid_history), gtk_label_new((const gchar*) row[x]), x, y, 1, 1);
-		y = y + 1;
-	}
-	gtk_widget_show_all(grid_history);
-}
 
-void get_history() {
-	sprintf(sql_select, "SELECT R.student_id, SUM(R.score) AS total, R.exam_id, R.session_id, S.started_at, E.title FROM responses R JOIN exams E ON R.exam_id=E.id JOIN sessions S ON S.id=R.session_id GROUP BY R.student_id, R.session_id HAVING (R.exam_id IN (SELECT exams.id FROM exams WHERE exams.prof_id='%s'))", user_obj.id);
-	if(mysql_query(conn, sql_select)) {
-    	fprintf(stderr, "%s\n", mysql_error(conn));
-		return;
-  	}
-	res = mysql_store_result(conn);
-	
-	while ((row = mysql_fetch_row(res)))
-	{
-		char temp[128];
-		sprintf(temp, row[4]);
-		strcat(temp, " ");
-		strcat(temp, row[5]);
-		gtk_list_store_insert_with_values(GTK_LIST_STORE(liststore4), NULL, -1, 0, row[3], 1, temp, -1);		
-		memset(temp, 0, 128);
-	}
-	mysql_free_result(res);
-}
 
 
 //**************************** student password handler ********************//
