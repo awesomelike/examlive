@@ -145,6 +145,7 @@ void signal_handler(int sig) {
 	if(GLOBAL_EXAM_STATUS==START && user_obj.id[0]=='P') {
 		update_exam_status(FINISH);
 	}
+	printf("\n");
 	exit(EXIT_SUCCESS);
 }
 
@@ -964,16 +965,15 @@ void split_string(char buf[], char* array[]){
 }
 
 int session_history_id;
-int history_count = 0;
+int history_count = -1;
 void on_combo_history_changed(GtkComboBox *c) {
 	session_history_id = atoi(gtk_combo_box_get_active_id(combo_history));
 	printf("%d\n", session_history_id);
-	
-	if(history_count!=0) {
-		for(int i=1; i<=history_count; i++) {
-			gtk_grid_remove_row(grid_history, i);
+	if(history_count!=-1) {
+		for(int i=history_count; i>=1; i--) {
+			gtk_grid_remove_row(GTK_GRID(grid_history), i);
 		}
-		gtk_widget_show_all(grid_history);
+		gtk_widget_hide(grid_history);
 	}
 	
 	sprintf(sql_select, "SELECT R.student_id, students.full_name, SUM(R.score) AS total, R.exam_id, R.session_id, S.started_at, E.title FROM responses R JOIN exams E ON R.exam_id=E.id JOIN students ON students.id=R.student_id JOIN sessions S ON S.id=R.session_id GROUP BY R.student_id, R.session_id HAVING (R.exam_id IN (SELECT exams.id FROM exams WHERE exams.prof_id='%s')) AND R.session_id=%d", user_obj.id, session_history_id);
@@ -995,6 +995,7 @@ void on_combo_history_changed(GtkComboBox *c) {
 		gtk_grid_attach(GTK_GRID(grid_history), gtk_label_new((const gchar*) row[x]), x, y, 1, 1);
 		y = y + 1;
 	}
+	mysql_free_result(res);
 	gtk_widget_show_all(grid_history);
 }
 
