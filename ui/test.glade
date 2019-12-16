@@ -22,6 +22,14 @@
       <column type="gchararray"/>
     </columns>
   </object>
+  <object class="GtkListStore" id="liststore4">
+    <columns>
+      <!-- column-name ID -->
+      <column type="gchararray"/>
+      <!-- column-name Exam_session -->
+      <column type="gchararray"/>
+    </columns>
+  </object>
   <object class="GtkWindow" id="pr_window_panel">
     <property name="can_focus">False</property>
     <property name="resizable">False</property>
@@ -494,15 +502,113 @@
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <child>
-                  <object class="GtkLabel">
-                    <property name="width_request">100</property>
+                  <object class="GtkComboBox" id="combo_history">
+                    <property name="width_request">360</property>
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
-                    <property name="label" translatable="yes">System analysis</property>
+                    <property name="model">liststore4</property>
+                    <property name="has_entry">True</property>
+                    <property name="entry_text_column">1</property>
+                    <property name="id_column">0</property>
+                    <signal name="changed" handler="on_combo_history_changed" swapped="no"/>
+                    <child internal-child="entry">
+                      <object class="GtkEntry" id="entry_combo_history">
+                        <property name="can_focus">False</property>
+                        <property name="editable">False</property>
+                      </object>
+                    </child>
                   </object>
                   <packing>
-                    <property name="x">12</property>
+                    <property name="x">29</property>
                     <property name="y">15</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkScrolledWindow">
+                    <property name="width_request">550</property>
+                    <property name="height_request">294</property>
+                    <property name="visible">True</property>
+                    <property name="can_focus">True</property>
+                    <property name="shadow_type">in</property>
+                    <child>
+                      <object class="GtkViewport">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="hscroll_policy">natural</property>
+                        <property name="vscroll_policy">natural</property>
+                        <child>
+                          <object class="GtkGrid" id="grid_history">
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <property name="column_homogeneous">True</property>
+                            <child>
+                              <object class="GtkLabel">
+                                <property name="visible">True</property>
+                                <property name="can_focus">False</property>
+                                <property name="label" translatable="yes">Student ID</property>
+                                <attributes>
+                                  <attribute name="font-desc" value="Sans Bold 12"/>
+                                </attributes>
+                              </object>
+                              <packing>
+                                <property name="left_attach">0</property>
+                                <property name="top_attach">0</property>
+                              </packing>
+                            </child>
+                            <child>
+                              <object class="GtkLabel">
+                                <property name="visible">True</property>
+                                <property name="can_focus">False</property>
+                                <property name="label" translatable="yes">Full name</property>
+                                <attributes>
+                                  <attribute name="font-desc" value="Sans Bold 12"/>
+                                </attributes>
+                              </object>
+                              <packing>
+                                <property name="left_attach">1</property>
+                                <property name="top_attach">0</property>
+                              </packing>
+                            </child>
+                            <child>
+                              <object class="GtkLabel">
+                                <property name="visible">True</property>
+                                <property name="can_focus">False</property>
+                                <property name="label" translatable="yes">Score</property>
+                                <attributes>
+                                  <attribute name="font-desc" value="Sans Bold 12"/>
+                                </attributes>
+                              </object>
+                              <packing>
+                                <property name="left_attach">2</property>
+                                <property name="top_attach">0</property>
+                              </packing>
+                            </child>
+                            <child>
+                              <placeholder/>
+                            </child>
+                            <child>
+                              <placeholder/>
+                            </child>
+                            <child>
+                              <placeholder/>
+                            </child>
+                            <child>
+                              <placeholder/>
+                            </child>
+                            <child>
+                              <placeholder/>
+                            </child>
+                            <child>
+                              <placeholder/>
+                            </child>
+                          </object>
+                        </child>
+                      </object>
+                    </child>
+                  </object>
+                  <packing>
+                    <property name="x">29</property>
+                    <property name="y">70</property>
                   </packing>
                 </child>
               </object>
@@ -510,17 +616,6 @@
                 <property name="name">page2</property>
                 <property name="title" translatable="yes">Quiz History</property>
                 <property name="position">2</property>
-              </packing>
-            </child>
-            <child>
-              <object class="GtkFixed" id="pr_list_quiz">
-                <property name="visible">True</property>
-                <property name="can_focus">False</property>
-              </object>
-              <packing>
-                <property name="name">page3</property>
-                <property name="title" translatable="yes">Student List</property>
-                <property name="position">3</property>
               </packing>
             </child>
             <child>
@@ -664,28 +759,13 @@
               <packing>
                 <property name="name">page4</property>
                 <property name="title" translatable="yes">Settings</property>
-                <property name="position">4</property>
+                <property name="position">3</property>
               </packing>
             </child>
           </object>
           <packing>
             <property name="x">245</property>
             <property name="y">78</property>
-          </packing>
-        </child>
-        <child>
-          <object class="GtkStackSwitcher" id="pr_start_qui">
-            <property name="width_request">231</property>
-            <property name="visible">True</property>
-            <property name="can_focus">False</property>
-            <property name="halign">center</property>
-            <property name="valign">center</property>
-            <property name="orientation">vertical</property>
-            <property name="stack">stackList</property>
-          </object>
-          <packing>
-            <property name="x">-1</property>
-            <property name="y">129</property>
           </packing>
         </child>
         <child>
@@ -733,6 +813,19 @@
           </object>
           <packing>
             <property name="y">460</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkStackSwitcher" id="stack_switcher">
+            <property name="width_request">230</property>
+            <property name="height_request">80</property>
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <property name="orientation">vertical</property>
+            <property name="stack">stackList</property>
+          </object>
+          <packing>
+            <property name="y">135</property>
           </packing>
         </child>
       </object>

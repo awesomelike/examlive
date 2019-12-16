@@ -81,6 +81,12 @@ GtkWidget *student_pwd_update_btn;
 GtkWidget *st_update_error_label;
 GtkWidget *st_update_success_label;
 
+//GTK Professor History page
+GtkWidget *combo_history;
+GtkWidget *entry_combo_history;
+GtkWidget *grid_history;
+GtkWidget *liststore4;
+
 //GTK Student Password update panel
 GtkWidget *pr_current_id;
 GtkWidget *pr_current_pwd;
@@ -189,6 +195,12 @@ void initialize_components() {
 	professor_pwd_update_btn = GTK_WIDGET(gtk_builder_get_object(builder, "professor_pwd_update_btn"));
 	pr_update_error_label = GTK_WIDGET(gtk_builder_get_object(builder, "pr_update_error_label"));
 	pr_update_success_label = GTK_WIDGET(gtk_builder_get_object(builder, "pr_update_success_label"));
+
+	//declare professor history page vars
+	combo_history = GTK_WIDGET(gtk_builder_get_object(builder, "combo_history"));
+	entry_combo_history = GTK_WIDGET(gtk_builder_get_object(builder, "entry_combo_history"));
+	grid_history = GTK_WIDGET(gtk_builder_get_object(builder, "grid_history"));
+	liststore4 = GTK_LIST_STORE(gtk_builder_get_object(builder, "liststore4"));
 
 	//These lines used to connect CSS
     provider = gtk_css_provider_new();

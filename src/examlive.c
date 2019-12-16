@@ -50,6 +50,8 @@ void join_exam(GtkButton*, int);
 //Utility function prototypes
 void clear_question_form();
 void get_professor_exams();
+void append_new_exam();
+void get_history();
 void get_professor_courses();
 void get_ip_address(char *);
 void get_next_question();
@@ -162,7 +164,7 @@ void on_sign_in_clicked  (GtkButton *b) {
 			
 			get_professor_courses();
 			get_professor_exams();
-			
+			get_history();
 			gtk_label_set_text(GTK_LABEL(label_prof_id), (const gchar*) user_obj.id);
 			gtk_label_set_text(GTK_LABEL(label_prof_name), (const gchar*) user_obj.full_name);
 			gtk_label_set_text(GTK_LABEL(login_label_error), (const gchar*) "");
@@ -474,8 +476,9 @@ void on_btn_add_question_clicked (GtkButton *b) {
 }
 
 void on_btn_save_exam_clicked (GtkButton *b) {
-	gtk_list_store_clear(GTK_LIST_STORE(liststore3));
-	get_professor_exams();
+	//gtk_list_store_clear(GTK_LIST_STORE(liststore3));
+	//get_professor_exams();
+	append_new_exam();
 	gtk_widget_set_sensitive(entry_exam_title, TRUE);
 	gtk_widget_set_sensitive(combo_course, TRUE);
 	gtk_widget_set_sensitive(btn_add_question, FALSE);
@@ -809,6 +812,19 @@ void hide_exam_grid() {
 	gtk_widget_show(spinner_results);
 }
 
+void append_new_exam() {
+	sprintf(sql_select, "SELECT id, title FROM exams WHERE prof_id='%s' AND id=%d", user_obj.id, exam_obj.id);
+	if(mysql_query(conn, sql_select)) {
+		fprintf(stderr, "%s\n", mysql_error(conn));		
+	}
+	res = mysql_store_result(conn);
+	while ((row = mysql_fetch_row(res)))
+	{
+		gtk_list_store_insert_with_values(GTK_LIST_STORE(liststore3), NULL, -1, 0, row[0], 1, row[1], -1);	
+	}
+	mysql_free_result(res);
+}
+
 void get_professor_exams() {
 	sprintf(sql_select, "SELECT id, title FROM exams WHERE prof_id='%s'", user_obj.id);
 	if(mysql_query(conn, sql_select)) {
@@ -839,6 +855,8 @@ void update_exam_status(int status) {
 
 	if(status == START) {
 		
+		gtk_widget_set_sensitive(combo_start_quiz, FALSE);
+		gtk_widget_set_sensitive(btn_start_exam, FALSE);
 		//Create new exam session
 		sprintf(sql_insert, "INSERT INTO sessions(started_at) VALUES(NOW())");
 		if(mysql_query(conn, sql_insert)) {
@@ -988,6 +1006,63 @@ void on_student_pwd_update_btn_clicked(GtkButton *e){
 	}
 	
 }
+int session_history_id;
+int history_count = 0;
+void on_combo_history_changed(GtkComboBox *c) {
+	session_history_id = atoi(gtk_combo_box_get_active_id(combo_history));
+	printf("%d\n", session_history_id);
+	
+	if(history_count!=0) {
+		//gtk_widget_hide(grid_history);
+		for(int i=1; i<=history_count; i++) {
+			gtk_grid_remove_row(grid_history, i);
+		}
+		gtk_widget_show_all(grid_history);
+	}
+	
+	sprintf(sql_select, "SELECT R.student_id, students.full_name, SUM(R.score) AS total, R.exam_id, R.session_id, S.started_at, E.title FROM responses R JOIN exams E ON R.exam_id=E.id JOIN students ON students.id=R.student_id JOIN sessions S ON S.id=R.session_id GROUP BY R.student_id, R.session_id HAVING (R.exam_id IN (SELECT exams.id FROM exams WHERE exams.prof_id='%s')) AND R.session_id=%d", user_obj.id, session_history_id);
+	if(mysql_query(conn, sql_select)) {
+    	fprintf(stderr, "%s\n", mysql_error(conn));
+		return;
+  	}
+	res = mysql_store_result(conn);  
+	history_count = mysql_num_rows(res);
+	
+	int y=1;
+	while ((row = mysql_fetch_row(res)))
+	{
+		int x=0;
+		gtk_grid_attach(GTK_GRID(grid_history), gtk_label_new((const gchar*) row[x]), x, y, 1, 1);
+		x = x + 1;
+		gtk_grid_attach(GTK_GRID(grid_history), gtk_label_new((const gchar*) row[x]), x, y, 1, 1);
+		x = x + 1;
+		gtk_grid_attach(GTK_GRID(grid_history), gtk_label_new((const gchar*) row[x]), x, y, 1, 1);
+		y = y + 1;
+	}
+	gtk_widget_show_all(grid_history);
+}
+
+void get_history() {
+	sprintf(sql_select, "SELECT R.student_id, SUM(R.score) AS total, R.exam_id, R.session_id, S.started_at, E.title FROM responses R JOIN exams E ON R.exam_id=E.id JOIN sessions S ON S.id=R.session_id GROUP BY R.student_id, R.session_id HAVING (R.exam_id IN (SELECT exams.id FROM exams WHERE exams.prof_id='%s'))", user_obj.id);
+	if(mysql_query(conn, sql_select)) {
+    	fprintf(stderr, "%s\n", mysql_error(conn));
+		return;
+  	}
+	res = mysql_store_result(conn);
+	
+	while ((row = mysql_fetch_row(res)))
+	{
+		char temp[128];
+		sprintf(temp, row[4]);
+		strcat(temp, " ");
+		strcat(temp, row[5]);
+		gtk_list_store_insert_with_values(GTK_LIST_STORE(liststore4), NULL, -1, 0, row[3], 1, temp, -1);		
+		memset(temp, 0, 128);
+	}
+	mysql_free_result(res);
+}
+
+
 //**************************** student password handler ********************//
 
 
