@@ -353,6 +353,7 @@
                 <child>
                   <object class="GtkButton" id="btn_add_question">
                     <property name="label">gtk-add</property>
+                    <property name="name">btn-primary</property>
                     <property name="width_request">200</property>
                     <property name="height_request">40</property>
                     <property name="visible">True</property>
@@ -507,6 +508,7 @@
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
                     <property name="model">liststore4</property>
+                    <property name="wrap_width">3</property>
                     <property name="has_entry">True</property>
                     <property name="entry_text_column">1</property>
                     <property name="id_column">0</property>
@@ -695,6 +697,7 @@
                 <child>
                   <object class="GtkButton" id="professor_pwd_update_btn">
                     <property name="label" translatable="yes">Update</property>
+                    <property name="name">btn-primary</property>
                     <property name="width_request">100</property>
                     <property name="height_request">40</property>
                     <property name="visible">True</property>
@@ -1181,30 +1184,6 @@
                                 <property name="top_attach">0</property>
                               </packing>
                             </child>
-                            <child>
-                              <placeholder/>
-                            </child>
-                            <child>
-                              <placeholder/>
-                            </child>
-                            <child>
-                              <placeholder/>
-                            </child>
-                            <child>
-                              <placeholder/>
-                            </child>
-                            <child>
-                              <placeholder/>
-                            </child>
-                            <child>
-                              <placeholder/>
-                            </child>
-                            <child>
-                              <placeholder/>
-                            </child>
-                            <child>
-                              <placeholder/>
-                            </child>
                           </object>
                         </child>
                       </object>
@@ -1269,7 +1248,8 @@
                 </child>
                 <child>
                   <object class="GtkButton" id="student_pwd_update_btn">
-                    <property name="label" translatable="yes">update</property>
+                    <property name="label" translatable="yes">Update</property>
+                    <property name="name">btn-primary</property>
                     <property name="width_request">110</property>
                     <property name="height_request">44</property>
                     <property name="visible">True</property>
@@ -1300,7 +1280,7 @@
                     <property name="height_request">20</property>
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
-                    <property name="label" translatable="yes">current password</property>
+                    <property name="label" translatable="yes">Current Password</property>
                   </object>
                   <packing>
                     <property name="x">147</property>
@@ -1312,7 +1292,7 @@
                     <property name="width_request">100</property>
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
-                    <property name="label" translatable="yes">new password</property>
+                    <property name="label" translatable="yes">New Password</property>
                   </object>
                   <packing>
                     <property name="x">174</property>

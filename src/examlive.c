@@ -255,7 +255,6 @@ void on_entry_exam_title_activate (GtkEntry *e) {
 	gtk_widget_set_sensitive(e, FALSE);
 	gtk_widget_set_sensitive(combo_course, FALSE);
 	gtk_widget_set_sensitive(btn_add_question, TRUE);
-	gtk_widget_set_sensitive(btn_save_exam, TRUE);
 	gtk_widget_show(entry_question);
 	gtk_widget_show(grid_create_answers);
 	if(mysql_query(conn, sql_insert)) {
@@ -458,7 +457,9 @@ int num_questions = 0;
 void on_btn_add_question_clicked (GtkButton *b) {
 	pthread_t id;
 	pthread_create(&id, NULL, showSpinner, NULL);
-	
+	if(!gtk_widget_get_sensitive(btn_save_exam)) {
+		gtk_widget_set_sensitive(btn_save_exam, TRUE);
+	}
 	char sql_insert[1024];
 	num_questions = num_questions + 1;
 	sprintf(sql_insert, "INSERT INTO questions(exam_id, question, question_number) VALUES(%d, '%s', %d)", exam_obj.id, gtk_entry_get_text(entry_question), num_questions);
