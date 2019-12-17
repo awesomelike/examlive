@@ -25,7 +25,7 @@
 
 
 //Database credentials
-static char *host = "localhost";
+static char *host = "192.168.43.45";
 static char *user = "root";
 static char *dbname = "examlive";
 static char *pass = "root";

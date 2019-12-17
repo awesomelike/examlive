@@ -83,6 +83,53 @@
           </packing>
         </child>
         <child>
+          <object class="GtkLabel" id="label_prof_name">
+            <property name="width_request">100</property>
+            <property name="height_request">80</property>
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <property name="label" translatable="yes">ANDREY DRAGUNOV</property>
+            <attributes>
+              <attribute name="font-desc" value="Sans Bold 14"/>
+              <attribute name="foreground" value="#ffffffffffff"/>
+            </attributes>
+          </object>
+          <packing>
+            <property name="x">8</property>
+            <property name="y">-17</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkLabel" id="label_prof_id">
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <property name="label" translatable="yes">P00323</property>
+            <attributes>
+              <attribute name="font-desc" value="Sans 12"/>
+              <attribute name="foreground" value="#ffffffffffff"/>
+            </attributes>
+          </object>
+          <packing>
+            <property name="x">8</property>
+            <property name="y">38</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkButton" id="leave_button">
+            <property name="label" translatable="yes">Leave</property>
+            <property name="name">leave_btn</property>
+            <property name="width_request">231</property>
+            <property name="height_request">40</property>
+            <property name="visible">True</property>
+            <property name="can_focus">True</property>
+            <property name="receives_default">True</property>
+            <signal name="clicked" handler="on_leave_button_clicked" swapped="no"/>
+          </object>
+          <packing>
+            <property name="y">460</property>
+          </packing>
+        </child>
+        <child>
           <object class="GtkStack" id="stackList">
             <property name="width_request">640</property>
             <property name="height_request">400</property>
@@ -650,65 +697,16 @@
           </packing>
         </child>
         <child>
-          <object class="GtkLabel" id="label_prof_name">
+          <object class="GtkStackSwitcher">
             <property name="width_request">100</property>
             <property name="height_request">80</property>
             <property name="visible">True</property>
             <property name="can_focus">False</property>
-            <property name="label" translatable="yes">ANDREY DRAGUNOV</property>
-            <attributes>
-              <attribute name="font-desc" value="Sans Bold 14"/>
-              <attribute name="foreground" value="#ffffffffffff"/>
-            </attributes>
-          </object>
-          <packing>
-            <property name="x">8</property>
-            <property name="y">-17</property>
-          </packing>
-        </child>
-        <child>
-          <object class="GtkLabel" id="label_prof_id">
-            <property name="visible">True</property>
-            <property name="can_focus">False</property>
-            <property name="label" translatable="yes">P00323</property>
-            <attributes>
-              <attribute name="font-desc" value="Sans 12"/>
-              <attribute name="foreground" value="#ffffffffffff"/>
-            </attributes>
-          </object>
-          <packing>
-            <property name="x">8</property>
-            <property name="y">38</property>
-          </packing>
-        </child>
-        <child>
-          <object class="GtkButton" id="leave_button">
-            <property name="label" translatable="yes">Leave</property>
-            <property name="name">leave_btn</property>
-            <property name="width_request">231</property>
-            <property name="height_request">40</property>
-            <property name="visible">True</property>
-            <property name="can_focus">True</property>
-            <property name="receives_default">True</property>
-            <signal name="clicked" handler="on_leave_button_clicked" swapped="no"/>
-          </object>
-          <packing>
-            <property name="y">460</property>
-          </packing>
-        </child>
-        <child>
-          <object class="GtkStackSwitcher" id="pr_start_qui">
-            <property name="width_request">231</property>
-            <property name="visible">True</property>
-            <property name="can_focus">False</property>
-            <property name="halign">center</property>
-            <property name="valign">center</property>
-            <property name="orientation">vertical</property>
             <property name="stack">stackList</property>
           </object>
           <packing>
-            <property name="x">-1</property>
-            <property name="y">129</property>
+            <property name="x">52</property>
+            <property name="y">170</property>
           </packing>
         </child>
       </object>
