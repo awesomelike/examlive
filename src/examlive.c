@@ -1000,7 +1000,7 @@ void on_combo_history_changed(GtkComboBox *c) {
 }
 
 void get_history() {
-	sprintf(sql_select, "SELECT R.student_id, SUM(R.score) AS total, R.exam_id, R.session_id, S.started_at, E.title FROM responses R JOIN exams E ON R.exam_id=E.id JOIN sessions S ON S.id=R.session_id GROUP BY R.student_id, R.session_id HAVING (R.exam_id IN (SELECT exams.id FROM exams WHERE exams.prof_id='%s'))", user_obj.id);
+	sprintf(sql_select, "SELECT R.student_id, SUM(R.score) AS total, R.exam_id, R.session_id, S.started_at, E.title, C.title FROM responses R JOIN exams E ON R.exam_id=E.id JOIN courses C ON E.course_id=C.id JOIN sessions S ON S.id=R.session_id GROUP BY R.student_id, R.session_id HAVING (R.exam_id IN (SELECT exams.id FROM exams WHERE exams.prof_id='%s'))", user_obj.id);
 	if(mysql_query(conn, sql_select)) {
     	fprintf(stderr, "%s\n", mysql_error(conn));
 		return;
@@ -1011,6 +1011,8 @@ void get_history() {
 	{
 		char temp[128];
 		sprintf(temp, row[4]);
+		strcat(temp, " ");
+		strcat(temp, row[6]);
 		strcat(temp, " ");
 		strcat(temp, row[5]);
 		gtk_list_store_insert_with_values(GTK_LIST_STORE(liststore4), NULL, -1, 0, row[3], 1, temp, -1);		
