@@ -323,14 +323,13 @@ void request_handler_thread(void *s) {
 				gtk_grid_attach(GTK_GRID(grid_student_results), strcmp(row[3], "0")?gtk_image_new_from_file((const gchar*)"./style/tick.png"):gtk_image_new_from_file((const gchar*)"./style/cross.png") , question_number + 1, student->table_position, 1, 1);
 				char score_temp[3];
 				sprintf(score_temp, "%d", student->score);
-				//gtk_grid_attach(GTK_GRID(grid_student_results), gtk_label_new((const gchar*)score_temp), total_position, student->table_position, 1, 1);
 				gtk_label_set_text(GTK_LABEL(gtk_grid_get_child_at(GTK_GRID(grid_student_results), total_position, student->table_position)), (const gchar*)score_temp);
 				memset(score_temp, 0, 3);				
 				gtk_widget_show_all(grid_student_results);
 			}
 					
 		} else if(receive==0){
-            //fprintf(stderr, "request handler socket() failed: %s\n", strerror(errno));
+ 
         } else
 		{
 			fprintf(stderr, "request handler socket() failed: %s\n", strerror(errno));
@@ -362,12 +361,10 @@ void table_thread() {
 		gtk_grid_attach(GTK_GRID(grid_student_results), gtk_label_new((const gchar*)str_i), i+1, 0, 1, 1);
 		i=i+1;
 	}
-	//gtk_grid_insert_column(GTK_GRID(grid_student_results), i);
 	total_position = i+2;
 	gtk_grid_attach(GTK_GRID(grid_student_results), gtk_label_new((const gchar*)"Total"), i+2, 0, 1, 1);
 	gtk_widget_set_sensitive(btn_finish_exam, TRUE);
 	gtk_widget_set_sensitive(combo_course, FALSE);
-	//gtk_widget_set_sensitive(btn_start_exam, FALSE);
 	gtk_widget_show_all(grid_student_results);
 }
 
@@ -498,8 +495,6 @@ void on_btn_add_question_clicked (GtkButton *b) {
 }
 
 void on_btn_save_exam_clicked (GtkButton *b) {
-	//gtk_list_store_clear(GTK_LIST_STORE(liststore3));
-	//get_professor_exams();
 	append_new_exam();
 	gtk_widget_set_sensitive(entry_exam_title, TRUE);
 	gtk_widget_set_sensitive(combo_course, TRUE);
@@ -665,8 +660,6 @@ void server_listener() {
 					gtk_widget_hide(label_exam_question);
 					gtk_widget_hide(label_exam_question_number);
 				}
-				//gtk_widget_hide(label_exam_question);
-				//gtk_widget_hide(spinner_results);
 				
 				gtk_widget_show(scroll_exam);
 				gtk_widget_show(label_results_announced);
@@ -675,7 +668,6 @@ void server_listener() {
 			}
 
         } else if (receive == 0) {
-            //fprintf(stderr, "socket() failed: %s\n", strerror(errno));
 			break;
         } else { 
             fprintf(stderr, "socket() failed: %s\n", strerror(errno));
@@ -700,7 +692,6 @@ void join_exam(GtkButton* b, int y) {
 		sprintf(exam_ip, row[0]);
 		port  = atoi(row[1]);
 	}
-	//exam_ip[strcspn(exam_ip, "\n")] = 0;
 	exam_ip[strlen(exam_ip)-1] = 0;
 	
     char buffer[1024] = {0}; 
