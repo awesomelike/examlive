@@ -123,7 +123,7 @@ int main(int argc, char *argv[]) {
 	gtk_widget_hide(grid_create_answers);
 	gtk_widget_set_sensitive(btn_add_question, FALSE);
 	gtk_widget_set_sensitive(btn_save_exam, FALSE);
-    gtk_widget_show(login_window);
+	gtk_widget_show(login_window);
 	gtk_widget_hide(grid_student_results);
 	gtk_widget_hide(spinner_results);
 	gtk_widget_hide(grid_exam_results);
@@ -225,13 +225,6 @@ void on_sign_in_clicked  (GtkButton *b) {
 		gtk_label_set_text(GTK_LABEL(login_label_error), (const gchar*) "Invalid user id, or password");
 		gtk_spinner_stop(login_spinner);
 	}
-	
-//pr windows current position state
-	// gtk_window_get_position(login_window, &x, &y);
-	// gtk_window_move (pr_window_panel,x,y);
-	// gtk_window_move (login_window,x,y);
-	// 	printf("current position SIGN IN PAGE is:\nx: %i\ny:%i\n", x, y);
- //window switches
 }
 
 void on_login_username_changed(GtkEntry *e){
@@ -509,12 +502,6 @@ void on_btn_save_exam_clicked (GtkButton *b) {
 
 void on_leave_button_clicked(GtkButton *b){
 	exit(EXIT_SUCCESS);
-//pr windows current position state
-	// gtk_window_get_position(pr_window_panel, &x, &y);
-	// gtk_window_move (login_window, x , y);
-	
-//window switches
-
 }
 void on_leave_button_student_clicked(GtkButton *b) {
 	exit(EXIT_SUCCESS);
@@ -535,7 +522,7 @@ void get_online_exams() {
 	if(mysql_query(conn, sql_select)) {
     	fprintf(stderr, "%s\n", mysql_error(conn)); 
   	}
-  	res = mysql_store_result(conn);
+	res = mysql_store_result(conn);
 	int y=1;
 	while ((row = mysql_fetch_row(res)))
 	{
@@ -651,7 +638,7 @@ void server_listener() {
 					memset(temp, 0, 3);
 					y = y + 1;
 				}
-				if(gtk_widget_is_visible(spinner_results)) {
+				if (gtk_widget_is_visible(spinner_results)) {
 					gtk_widget_hide(label_exam_question);
 					gtk_widget_hide(spinner_results);
 				} else
@@ -668,9 +655,9 @@ void server_listener() {
 			}
 
         } else if (receive == 0) {
-			break;
+					break;
         } else { 
-            fprintf(stderr, "socket() failed: %s\n", strerror(errno));
+          fprintf(stderr, "socket() failed: %s\n", strerror(errno));
         }
     }
 }
@@ -859,6 +846,7 @@ void update_exam_status(int status) {
 		
 		gtk_widget_set_sensitive(combo_start_quiz, FALSE);
 		gtk_widget_set_sensitive(btn_start_exam, FALSE);
+		
 		//Create new exam session
 		sprintf(sql_insert, "INSERT INTO sessions(started_at) VALUES(NOW())");
 		if(mysql_query(conn, sql_insert)) {
@@ -871,6 +859,7 @@ void update_exam_status(int status) {
 		ip[strcspn(ip, "\n")] = 0;
 		if( ip[strlen(ip)-1] == '\n' )
     		ip[strlen(ip)-1] = 0;		
+		
 		//Update exam status and store server ip and port in the database
 		sprintf(sql_update, "UPDATE exams SET status=1, ip_address='%s', port_number=%d WHERE id=%d", ip, PORT, exam_obj.id);
 		if (mysql_query(conn, sql_update))
@@ -880,6 +869,7 @@ void update_exam_status(int status) {
 		res = mysql_use_result(conn);
 		mysql_free_result(res);
 	} else if (status == FINISH) {
+		
 		//Finish this session
 		sprintf(sql_insert, "UPDATE sessions SET finished_at=NOW() WHERE id=%d", session_id);
 		if(mysql_query(conn, sql_insert)) {
