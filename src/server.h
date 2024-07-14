@@ -5,19 +5,20 @@
 #include <string.h>
 
 typedef struct StudentNode
-{   
+{
     int fd;
     char id[7];
     char ip[32];
     char name[128];
-    struct StudentNode* next;
-    struct StudentNode* prev;
+    struct StudentNode *next;
+    struct StudentNode *prev;
     int table_position;
     int score;
 } StudentList;
 
-StudentList *newNode(int sock_fd, char *ip) {
-    StudentList *newStudent = (StudentList*)malloc(sizeof(StudentList));
+StudentList *newNode(int sock_fd, char *ip)
+{
+    StudentList *newStudent = (StudentList *)malloc(sizeof(StudentList));
     newStudent->fd = sock_fd;
     strcpy(newStudent->id, "undefined");
     strcpy(newStudent->ip, ip);
